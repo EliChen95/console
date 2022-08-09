@@ -47,14 +47,23 @@ export default class Params extends React.Component {
   }
 
   static getDerivedStateFromProps(nextProps) {
+    const { activeTask } = nextProps
+    const codeParameters = activeTask.parameters?.filter(p => p.type === 'code')
     if (isEmpty(nextProps.edittingData)) {
-      return {
-        formData: {},
+      if (codeParameters.length) {
+        return {
+          value: codeParameters[0].defaultValue || '',
+        }
       }
+      const formData = activeTask.parameters.reduce(
+        (pre, { name, defaultValue }) => ({
+          ...pre,
+          [name]: defaultValue || '',
+        }),
+        {}
+      )
+      return { formData }
     }
-    const codeParameters = nextProps.activeTask?.parameters?.filter(
-      p => p.type === 'code'
-    )
     if (codeParameters.length) {
       return {
         value: nextProps.edittingData.value[codeParameters[0].name],
@@ -127,17 +136,7 @@ export default class Params extends React.Component {
           <Form.Item
             {...{
               ...defaultFormItemProps,
-              desc: (
-                <p>
-                  {t('SELECT_CREDENTIAL_DESC')}
-                  <span
-                    className={styles.clickable}
-                    onClick={this.props.showCredential}
-                  >
-                    {t('CREATE_CREDENTIAL')}
-                  </span>
-                </p>
-              ),
+              desc: this.renderCredentialDesc(),
             }}
           >
             <Select
@@ -157,22 +156,13 @@ export default class Params extends React.Component {
       case 'number':
         return (
           <Form.Item {...defaultFormItemProps}>
-            <NumberInput
-              name={option.name}
-              defaultValue={option.defaultValue || ''}
-              {...(option.props || {})}
-            />
+            <NumberInput name={option.name} {...(option.props || {})} />
           </Form.Item>
         )
       case 'text':
         return (
           <Form.Item {...defaultFormItemProps}>
-            <TextArea
-              name={option.name}
-              defaultValue={option.defaultValue || ''}
-              rows={8}
-              {...(option.props || {})}
-            />
+            <TextArea name={option.name} rows={8} {...(option.props || {})} />
           </Form.Item>
         )
       case 'enum':
@@ -181,7 +171,6 @@ export default class Params extends React.Component {
             <Select
               name={option.name}
               options={option.options || []}
-              defaultValue={option.defaultValue || ''}
               {...(option.props || {})}
             />
           </Form.Item>
@@ -201,11 +190,7 @@ export default class Params extends React.Component {
       case 'bool':
         return (
           <Form.Item {...{ ...defaultFormItemProps, label: '', desc: '' }}>
-            <Checkbox
-              name={option.name}
-              defaultValue={option.defaultValue || ''}
-              {...(option.props || {})}
-            >
+            <Checkbox name={option.name} {...(option.props || {})}>
               {option.display}
             </Checkbox>
           </Form.Item>
@@ -214,11 +199,7 @@ export default class Params extends React.Component {
       default:
         return (
           <Form.Item {...defaultFormItemProps}>
-            <Input
-              name={option.name}
-              defaultValue={option.defaultValue || ''}
-              {...(option.props || {})}
-            />
+            <Input name={option.name} {...(option.props || {})} />
           </Form.Item>
         )
     }
