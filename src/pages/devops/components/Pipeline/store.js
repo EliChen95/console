@@ -19,6 +19,7 @@
 import { action, observable, computed, toJS } from 'mobx'
 import { get, set, unset, isObject, isEmpty, isArray, cloneDeep } from 'lodash'
 
+import cookie from 'utils/cookie'
 import CredentialStore from 'stores/devops/credential'
 import BaseStore from 'stores/devops'
 import CDStore from 'stores/cd'
@@ -330,5 +331,48 @@ export default class Store extends BaseStore {
         value: item,
       }))
     }
+  }
+
+  @action
+  async fetchPipelineStepTemplates() {
+    const lang = cookie('lang') === 'zh' ? 'ZH' : 'EN'
+
+    const data = await request.get(
+      `${this.getBaseUrl()}clustersteptemplates?limit=100`
+    )
+    const { items = [] } = data
+    const templateList = items.map(item => {
+      const template = {}
+      const annotations = get(item, 'metadata.annotations', {})
+      template.icon = annotations['step.devops.kubesphere.io/icon']
+      template.category = get(
+        item,
+        ['metadata', 'labels', 'step.devops.kubesphere.io/category'],
+        'others'
+      )
+      template.name = item.metadata.name
+      template.desc =
+        annotations[`devops.kubesphere.io/description${lang}`] ||
+        annotations['devops.kubesphere.io/descriptionEN']
+      template.title =
+        annotations[`devops.kubesphere.io/displayName${lang}`] ||
+        annotations['devops.kubesphere.io/displayNameEN'] ||
+        annotations.displayNameEN
+
+      template.parameters = get(item, 'spec.parameters', [])
+      return template
+    })
+    return templateList
+  }
+
+  async getPipelineStepTempleJenkins(clustersteptemplate, params) {
+    const data = await request.post(
+      `${this.getBaseUrl()}clustersteptemplates/${clustersteptemplate}/render`,
+      params
+    )
+
+    const jenkins = get(data, 'data', '')
+
+    return jenkins
   }
 }
