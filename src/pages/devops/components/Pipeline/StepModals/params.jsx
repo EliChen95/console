@@ -33,6 +33,11 @@ import { safeParseJSON } from 'utils'
 
 import styles from './index.scss'
 
+const boolMap = new Map([
+  [true, 'true'],
+  [false, 'false'],
+])
+
 export default class Params extends React.Component {
   static defaultProps = {
     visible: false,
@@ -43,37 +48,34 @@ export default class Params extends React.Component {
   constructor(props) {
     super(props)
     this.formRef = React.createRef()
-    this.state = { formData: {}, value: '' }
+    this.state = { formData: {}, value: '', paramTypeMap: {}, initData: {} }
   }
 
   static getDerivedStateFromProps(nextProps) {
-    const { activeTask } = nextProps
-    const codeParameters = activeTask.parameters?.filter(p => p.type === 'code')
-    if (isEmpty(nextProps.edittingData)) {
-      if (codeParameters.length) {
-        return {
-          value: codeParameters[0].defaultValue || '',
-        }
-      }
-      const formData = activeTask.parameters.reduce(
-        (pre, { name, defaultValue }) => ({
-          ...pre,
-          [name]: defaultValue || '',
-        }),
-        {}
-      )
-      return { formData }
+    const { activeTask, edittingData } = nextProps
+    let codeTypeName = ''
+    const initData = {}
+    const paramTypeMap = {}
+    activeTask.parameters?.forEach(({ name, type, defaultValue }) => {
+      initData[name] = defaultValue || ''
+      paramTypeMap[name] = type
+      type === 'code' && (codeTypeName = name)
+    })
+    if (isEmpty(edittingData)) {
+      return codeTypeName
+        ? { value: initData[codeTypeName], initData, paramTypeMap }
+        : { formData: initData, initData, paramTypeMap }
     }
-    if (codeParameters.length) {
-      return {
-        value: nextProps.edittingData.value[codeParameters[0].name],
-      }
+
+    if (codeTypeName) {
+      return { value: edittingData.value[codeTypeName], initData, paramTypeMap }
     }
-    const formData = nextProps.edittingData.data.reduce((prev, arg) => {
-      prev[arg.key] = arg.value.value
+    const formData = edittingData.data.reduce((prev, arg) => {
+      const isBoolValue = paramTypeMap[arg.key] === 'bool'
+      prev[arg.key] = isBoolValue ? arg.value.value === 'true' : arg.value.value
       return prev
     }, {})
-    return { formData }
+    return { formData, initData, paramTypeMap }
   }
 
   getCredentialsListData = params => {
@@ -120,8 +122,7 @@ export default class Params extends React.Component {
     const { credentialsList } = this.props.store
     const defaultFormItemProps = {
       key: option.name,
-      label: option.name,
-      desc: option.display,
+      label: option.display,
       rules: [
         {
           required: option.required ?? false,
@@ -206,20 +207,24 @@ export default class Params extends React.Component {
   }
 
   handleOk = () => {
-    const formData = this.formRef.current.getData()
-    const initData = this.props.activeTask.parameters.reduce(
-      (pre, { name }) => ({
-        ...pre,
-        [name]: '',
-      }),
+    const { activeTask, store, onAddStep } = this.props
+    const { paramTypeMap, initData } = this.state
+    const formData = Object.entries(this.formRef.current.getData()).reduce(
+      (prev, [key, value]) => {
+        const isBoolValue = paramTypeMap[key] === 'bool'
+        return {
+          ...prev,
+          [key]: isBoolValue ? boolMap.get(value) : (value || '').toString(),
+        }
+      },
       {}
     )
     this.formRef.current.validate(async () => {
-      const jsonData = await this.props.store.getPipelineStepTempleJenkins(
-        this.props.activeTask.name,
+      const jsonData = await store.getPipelineStepTempleJenkins(
+        activeTask.name,
         { ...initData, ...formData }
       )
-      this.props.onAddStep(safeParseJSON(jsonData, {}))
+      onAddStep(safeParseJSON(jsonData, {}))
     })
   }
 

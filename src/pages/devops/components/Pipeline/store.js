@@ -24,7 +24,7 @@ import CredentialStore from 'stores/devops/credential'
 import BaseStore from 'stores/devops'
 import CDStore from 'stores/cd'
 
-import { generateId } from 'utils'
+import { generateId, safeParseJSON } from 'utils'
 
 const formatPipeLineJson = json => {
   if (!get(json, 'pipeline.stages')) return
@@ -359,7 +359,17 @@ export default class Store extends BaseStore {
         annotations['devops.kubesphere.io/displayNameEN'] ||
         annotations.displayNameEN
 
-      template.parameters = get(item, 'spec.parameters', [])
+      template.parameters = get(item, 'spec.parameters', []).map(p => ({
+        ...p,
+        ...(p.options
+          ? {
+              options: safeParseJSON(p.options, []).map(opt => ({
+                label: t(opt.label),
+                value: opt.value,
+              })),
+            }
+          : {}),
+      }))
       return template
     })
     return templateList
