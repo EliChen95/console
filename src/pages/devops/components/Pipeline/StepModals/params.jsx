@@ -24,10 +24,9 @@ import {
   Input,
   TextArea,
   Checkbox,
-  Alert,
 } from '@kube-design/components'
 import { NumberInput } from 'components/Inputs'
-import { pick, set, isEmpty } from 'lodash'
+import { pick, set, isEmpty, get } from 'lodash'
 import { Modal, CodeEditor } from 'components/Base'
 import { safeParseJSON } from 'utils'
 
@@ -48,34 +47,58 @@ export default class Params extends React.Component {
   constructor(props) {
     super(props)
     this.formRef = React.createRef()
-    this.state = { formData: {}, value: '', paramTypeMap: {}, initData: {} }
+    this.state = {
+      formData: {},
+      value: '',
+      paramTypeMap: {},
+      initData: {},
+      name: '',
+    }
   }
 
-  static getDerivedStateFromProps(nextProps) {
+  componentDidMount() {
+    this.getCDListData()
+    this.getCredentialsListData()
+  }
+
+  static getDerivedStateFromProps(nextProps, state) {
     const { activeTask, edittingData } = nextProps
+    const { name } = activeTask
+    if (name === state.name) {
+      return null
+    }
+
     let codeTypeName = ''
     const initData = {}
     const paramTypeMap = {}
-    activeTask.parameters?.forEach(({ name, type, defaultValue }) => {
-      initData[name] = defaultValue || ''
-      paramTypeMap[name] = type
-      type === 'code' && (codeTypeName = name)
-    })
+    activeTask.parameters?.forEach(
+      ({ name: paramName, type, defaultValue }) => {
+        initData[paramName] =
+          type === 'bool' ? defaultValue === 'true' : defaultValue || ''
+        paramTypeMap[paramName] = type
+        type === 'code' && (codeTypeName = paramName)
+      }
+    )
     if (isEmpty(edittingData)) {
       return codeTypeName
-        ? { value: initData[codeTypeName], initData, paramTypeMap }
-        : { formData: initData, initData, paramTypeMap }
+        ? { value: initData[codeTypeName], initData, paramTypeMap, name }
+        : { formData: initData, initData, paramTypeMap, name }
     }
 
     if (codeTypeName) {
-      return { value: edittingData.value[codeTypeName], initData, paramTypeMap }
+      return {
+        value: edittingData.value[codeTypeName],
+        initData,
+        paramTypeMap,
+        name,
+      }
     }
     const formData = edittingData.data.reduce((prev, arg) => {
       const isBoolValue = paramTypeMap[arg.key] === 'bool'
       prev[arg.key] = isBoolValue ? arg.value.value === 'true' : arg.value.value
       return prev
     }, {})
-    return { formData, initData, paramTypeMap }
+    return { formData, initData, paramTypeMap, name }
   }
 
   getCredentialsListData = params => {
@@ -113,13 +136,32 @@ export default class Params extends React.Component {
     )
   }
 
+  getCDListData = params => {
+    return this.props.store.getCDListData(params)
+  }
+
+  getCDList = () => {
+    return [
+      ...this.props.store.cdList.data.map(item => ({
+        label: item.name,
+        value: item.name,
+      })),
+    ]
+  }
+
   handleCodeEditorChange = name => value => {
     const { formData } = this.state
     set(formData, name, value)
   }
 
+  handleCheckboxChange = key => value => {
+    const { formData } = this.state
+    set(formData, key, value)
+    this.setState({ formData })
+  }
+
   renderFormItem(option) {
-    const { credentialsList } = this.props.store
+    const { credentialsList, cdList } = this.props.store
     const defaultFormItemProps = {
       key: option.name,
       label: option.display,
@@ -130,8 +172,21 @@ export default class Params extends React.Component {
         },
       ],
     }
-
     switch (option.type) {
+      case 'CD':
+        return (
+          <Form.Item {...defaultFormItemProps}>
+            <Select
+              name={option.name}
+              options={this.getCDList()}
+              pagination={pick(cdList, ['page', 'limit', 'total'])}
+              isLoading={cdList.isLoading}
+              onFetch={this.getCDListData}
+              searchable
+              clearable
+            />
+          </Form.Item>
+        )
       case 'secret':
         return (
           <Form.Item
@@ -150,30 +205,25 @@ export default class Params extends React.Component {
               valueRenderer={this.optionRender}
               searchable
               clearable
-              {...(option.props || {})}
             />
           </Form.Item>
         )
       case 'number':
         return (
           <Form.Item {...defaultFormItemProps}>
-            <NumberInput name={option.name} {...(option.props || {})} />
+            <NumberInput name={option.name} />
           </Form.Item>
         )
       case 'text':
         return (
           <Form.Item {...defaultFormItemProps}>
-            <TextArea name={option.name} rows={8} {...(option.props || {})} />
+            <TextArea name={option.name} rows={8} />
           </Form.Item>
         )
       case 'enum':
         return (
           <Form.Item {...defaultFormItemProps}>
-            <Select
-              name={option.name}
-              options={option.options || []}
-              {...(option.props || {})}
-            />
+            <Select name={option.name} options={option.options || []} />
           </Form.Item>
         )
       case 'code':
@@ -185,13 +235,16 @@ export default class Params extends React.Component {
             mode="yaml"
             value={this.state.value}
             onChange={this.handleCodeEditorChange(option.name)}
-            {...(option.props || {})}
           />
         )
       case 'bool':
         return (
           <Form.Item {...{ ...defaultFormItemProps, label: '', desc: '' }}>
-            <Checkbox name={option.name} {...(option.props || {})}>
+            <Checkbox
+              name={option.name}
+              checked={get(this.state.formData, option.name, false)}
+              onChange={this.handleCheckboxChange(option.name)}
+            >
               {option.display}
             </Checkbox>
           </Form.Item>
@@ -200,7 +253,7 @@ export default class Params extends React.Component {
       default:
         return (
           <Form.Item {...defaultFormItemProps}>
-            <Input name={option.name} {...(option.props || {})} />
+            <Input name={option.name} />
           </Form.Item>
         )
     }
@@ -240,14 +293,6 @@ export default class Params extends React.Component {
         closable={false}
         title={activeTask.title}
       >
-        {activeTask.tips && (
-          <Alert
-            type="info"
-            icon="information"
-            className={styles.info}
-            message={t(`${activeTask.tips}`)}
-          />
-        )}
         <Form data={this.state.formData} ref={this.formRef}>
           {activeTask.parameters.map(option => this.renderFormItem(option))}
         </Form>

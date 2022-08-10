@@ -66,7 +66,7 @@ export default class StepsEditor extends React.Component {
   async componentDidMount() {
     await this.getPipelineSteps()
     const { type } = this.props.store.edittingData
-    const matchTask = this.state.stepTemplates.filter(t => t.name === type)
+    const matchTask = this.state.stepTemplates.filter(t => t.title === type)
     if (matchTask.length) {
       this.setState({
         activeTask: matchTask[0],
@@ -293,7 +293,7 @@ export default class StepsEditor extends React.Component {
                     <div className={styles.taskName}>
                       <span>{t(task.title)}</span>
                     </div>
-                    <div className={styles.desc}>{task.desc || '-'}</div>
+                    <div className={styles.desc}>{t(task.desc) || '-'}</div>
                   </div>
                 </div>
               ))}
