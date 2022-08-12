@@ -22,6 +22,7 @@ import { get, set, unset, isObject, isEmpty, isArray, cloneDeep } from 'lodash'
 import cookie from 'utils/cookie'
 import CredentialStore from 'stores/devops/credential'
 import BaseStore from 'stores/devops'
+import PipelineStore from 'stores/devops/pipelines'
 import CDStore from 'stores/cd'
 
 import { generateId, safeParseJSON } from 'utils'
@@ -72,6 +73,8 @@ export default class Store extends BaseStore {
   credentialStore = new CredentialStore()
 
   cdStore = new CDStore()
+
+  pipelineStore = new PipelineStore()
 
   get newStage() {
     return {
@@ -132,6 +135,12 @@ export default class Store extends BaseStore {
 
   @observable
   cdList = { data: [] }
+
+  @observable
+  pipelineList = { data: [] }
+
+  @observable
+  pipelineSteps = []
 
   handleAddBranch(lineIndex) {
     if (this.jsonData.json.pipeline.stages[lineIndex].parallel) {
@@ -300,6 +309,17 @@ export default class Store extends BaseStore {
   }
 
   @action
+  getPipelines = async params => {
+    await this.pipelineStore.fetchList({
+      devops: this.params.devops,
+      cluster: this.params.cluster,
+      filter: 'no-folders',
+      ...params,
+    })
+    this.pipelineList = this.pipelineStore.list
+  }
+
+  @action
   getCDListData = async params => {
     await this.cdStore.fetchList({
       devops: this.params.devops,
@@ -370,8 +390,18 @@ export default class Store extends BaseStore {
             }
           : {}),
       }))
+
+      if (!isEmpty(get(item, 'spec.secret', {}))) {
+        template.parameters.push({
+          name: 'secret',
+          type: 'secret',
+          display: 'Secret',
+        })
+      }
       return template
     })
+
+    this.pipelineSteps = templateList
     return templateList
   }
 

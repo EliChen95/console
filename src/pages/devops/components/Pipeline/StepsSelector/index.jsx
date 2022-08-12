@@ -36,8 +36,19 @@ const noInputTasks = {
   anyOf: true,
 }
 
-const taskIcon = {
+const condIcon = {
   branch: 'network-router',
+}
+
+const conditionDescs = {
+  branch: t('Current branch name must match the input value'),
+  environment: t(
+    'The environment variable entered before running the pipeline is match the current value.'
+  ),
+  expression: t('Enter an expression'),
+  not: t('Negative prefix'),
+  allOf: t('Internal nesting conditions must be matched'),
+  anyOf: t('Internal nested conditions only need to satisfy one'),
 }
 
 @observer
@@ -66,7 +77,7 @@ export default class StepsEditor extends React.Component {
   async componentDidMount() {
     await this.getPipelineSteps()
     const { type } = this.props.store.edittingData
-    const matchTask = this.state.stepTemplates.filter(t => t.title === type)
+    const matchTask = this.state.stepTemplates.filter(t => t.name === type)
     if (matchTask.length) {
       this.setState({
         activeTask: matchTask[0],
@@ -120,8 +131,8 @@ export default class StepsEditor extends React.Component {
     this.setState({
       isLoading: true,
     })
-    const steps = await this.props.store.fetchPipelineStepTemplates()
-
+    await this.props.store.fetchPipelineStepTemplates()
+    const steps = this.props.store.pipelineSteps
     if (!steps.length) return
     this.setState({
       stepTemplates: [...this.state.stepTemplates, ...steps],
@@ -220,19 +231,19 @@ export default class StepsEditor extends React.Component {
             {t('Add conditions')}
           </div>
           <div className={styles.taskList}>
-            {PIPELINE_CONDITIONS.map(task => (
+            {PIPELINE_CONDITIONS.map(cond => (
               <div
                 className={styles.task}
-                key={task}
-                onClick={this.handleAddTask(task)}
+                key={cond}
+                onClick={this.handleAddTask(cond)}
               >
                 <div className={styles.taskIcon}>
-                  <Icon name={taskIcon[task] || 'cdn'} size={24} />
+                  <Icon name={condIcon[cond] || 'cdn'} size={24} />
                 </div>
                 <div className={styles.taskInfo}>
-                  <div className={styles.taskName}>{task}</div>
+                  <div className={styles.taskName}>{cond}</div>
                   <div className={styles.desc}>
-                    {this.taskDescs[task] || '-'}
+                    {conditionDescs[cond] || '-'}
                   </div>
                 </div>
               </div>

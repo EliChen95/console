@@ -20,7 +20,6 @@ import React from 'react'
 import classNames from 'classnames'
 
 import { Icon } from '@kube-design/components'
-import { PIPELINE_TASKS } from 'utils/constants'
 import PropTypes from 'prop-types'
 
 import { toJS } from 'mobx'
@@ -43,7 +42,8 @@ const nestingSteps = {
 }
 
 const isEditable = function(name) {
-  return PIPELINE_TASKS.All.includes(name) || name === 'sh'
+  return true
+  // || PIPELINE_TASKS.All.includes(name) || name === 'sh'
 }
 
 export default class StepCard extends React.Component {

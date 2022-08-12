@@ -59,6 +59,7 @@ export default class Params extends React.Component {
   componentDidMount() {
     this.getCDListData()
     this.getCredentialsListData()
+    this.getPipelineListData()
   }
 
   static getDerivedStateFromProps(nextProps, state) {
@@ -149,6 +150,31 @@ export default class Params extends React.Component {
     ]
   }
 
+  getPipelineListData = params => {
+    return this.props.store.getPipelines(params)
+  }
+
+  getPipelineList = () => {
+    return [
+      ...this.props.store.pipelineList.data.map(pipeline => ({
+        label: pipeline.name,
+        value: pipeline.name,
+      })),
+    ]
+  }
+
+  handleSecretChange = value => {
+    const { formData } = this.state
+    const res = this.props.store.credentialsList.data.filter(
+      t => t.name === value
+    )
+    if (res.length) {
+      set(formData, 'secret', res[0].name)
+      set(formData, 'secretNamespace', res[0].namespace)
+    }
+    this.setState({ formData })
+  }
+
   handleCodeEditorChange = name => value => {
     const { formData } = this.state
     set(formData, name, value)
@@ -161,7 +187,7 @@ export default class Params extends React.Component {
   }
 
   renderFormItem(option) {
-    const { credentialsList, cdList } = this.props.store
+    const { credentialsList, cdList, pipelineList } = this.props.store
     const defaultFormItemProps = {
       key: option.name,
       label: option.display,
@@ -173,7 +199,21 @@ export default class Params extends React.Component {
       ],
     }
     switch (option.type) {
-      case 'CD':
+      case 'pipeline':
+        return (
+          <Form.Item {...defaultFormItemProps}>
+            <Select
+              name={option.name}
+              options={this.getPipelineList()}
+              pagination={pick(pipelineList, ['page', 'limit', 'total'])}
+              isLoading={pipelineList.isLoading}
+              onFetch={this.getPipelineListData}
+              searchable
+              clearable
+            />
+          </Form.Item>
+        )
+      case 'application':
         return (
           <Form.Item {...defaultFormItemProps}>
             <Select
@@ -201,6 +241,7 @@ export default class Params extends React.Component {
               pagination={pick(credentialsList, ['page', 'limit', 'total'])}
               isLoading={credentialsList.isLoading}
               onFetch={this.getCredentialsListData}
+              onChange={this.handleSecretChange}
               optionRenderer={this.optionRender}
               valueRenderer={this.optionRender}
               searchable
