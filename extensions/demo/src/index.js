@@ -5,13 +5,14 @@ const menu = {
   name: 'demo',
   title: 'Demo',
   icon: 'cluster',
-  order: 1,
-  desc: 'this is demo plugin',
+  order: 0,
+  desc: 'this is demo extension',
   skipAuth: true,
 };
 
-const pluginConfig = {
+const extensionConfig = {
   routes,
   menus: [menu],
 };
-globals.context.registerPlugin(pluginConfig);
+
+globals.context.registerExtension(extensionConfig);

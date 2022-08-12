@@ -3,7 +3,7 @@ import locales from './locales';
 
 const menu = {
   parent: 'topbar',
-  name: '{{pluginName}}',
+  name: '{{extensionName}}',
   title: '{{displayName}}',
   icon: 'cluster',
   order: 0,
@@ -11,9 +11,10 @@ const menu = {
   skipAuth: true,
 };
 
-const pluginConfig = {
+const extensionConfig = {
   routes,
   menus: [menu],
   locales,
 };
-globals.context.registerPlugin(pluginConfig);
+
+globals.context.registerExtension(extensionConfig);
