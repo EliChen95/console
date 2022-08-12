@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Banner, Field, StatusDot } from '@kubed/components';
+import { Banner, Button, Field, StatusDot } from '@kubed/components';
 import { Human } from '@kubed/icons';
 import { DataTable, formatTime } from '@ks-console/shared';
 import type { Column } from '@ks-console/shared';
@@ -15,8 +15,8 @@ export default function Accounts() {
       render: (value, row) => (
         <Field
           value={<Link to={value}>{value}</Link>}
-          label={row.spec?.email || ''}
-          avatar={<Avatar src={row.avatar_url || '/assets/default-user.svg'} alt={value} />}
+          label={row?.spec?.email || ''}
+          avatar={<Avatar src={row?.avatar_url || '/assets/default-user.svg'} alt={value} />}
         />
       ),
     },
@@ -26,14 +26,14 @@ export default function Accounts() {
       canHide: true,
       width: '20%',
       render: value => (
-        <StatusDot color="primary">{t(`USER_${(value ?? '').toUpperCase()}`)}</StatusDot>
+        <StatusDot color="success">{t(`USER_${(value ?? '').toUpperCase()}`)}</StatusDot>
       ),
     },
     {
       title: t('PLATFORM_ROLE'),
       canHide: true,
       width: '20%',
-      render: (value, row) => row?.metadata?.annotations?.['iam.kubesphere.io/globalrole'] ?? '-',
+      render: (value, row) => row?.metadata?.annotations?.['iam.kubesphere.io/globalrole'] || '-',
     },
     {
       title: t('LAST_LOGIN'),
@@ -43,6 +43,7 @@ export default function Accounts() {
       render: value => (value ? formatTime(value) : t('NOT_LOGIN_YET')),
     },
   ];
+  const batchActions = <Button color="error">删除</Button>;
 
   return (
     <>
@@ -52,6 +53,11 @@ export default function Accounts() {
         tableName="users"
         rowKey="name"
         url="kapis/iam.kubesphere.io/v1alpha2/users"
+        batchActions={batchActions}
+        disableRowSelect={row => {
+          const name = row?.metadata?.name;
+          return globals.config.presetUsers.includes(name) || globals.user.username === name;
+        }}
       />
     </>
   );
