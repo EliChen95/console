@@ -18,6 +18,7 @@
 
 import { action, observable, computed, toJS } from 'mobx'
 import { get, set, unset, isObject, isEmpty, isArray, cloneDeep } from 'lodash'
+import qs from 'qs'
 
 import cookie from 'utils/cookie'
 import CredentialStore from 'stores/devops/credential'
@@ -365,11 +366,11 @@ export default class Store extends BaseStore {
       const template = {}
       const annotations = get(item, 'metadata.annotations', {})
       template.icon = annotations['step.devops.kubesphere.io/icon']
-      template.category = get(
-        item,
-        ['metadata', 'labels', 'step.devops.kubesphere.io/category'],
-        'others'
-      )
+      template.category = get(item, [
+        'metadata',
+        'labels',
+        'step.devops.kubesphere.io/category',
+      ])
       template.name = item.metadata.name
       template.desc =
         annotations[`devops.kubesphere.io/description${lang}`] ||
@@ -396,6 +397,7 @@ export default class Store extends BaseStore {
           name: 'secret',
           type: 'secret',
           display: 'Secret',
+          postByQuery: true,
         })
       }
       return template
@@ -405,9 +407,11 @@ export default class Store extends BaseStore {
     return templateList
   }
 
-  async getPipelineStepTempleJenkins(clustersteptemplate, params) {
+  async getPipelineStepTempleJenkins(clustersteptemplate, params, query = {}) {
     const data = await request.post(
-      `${this.getBaseUrl()}clustersteptemplates/${clustersteptemplate}/render`,
+      `${this.getBaseUrl()}clustersteptemplates/${clustersteptemplate}/render?${qs.stringify(
+        query
+      )}`,
       params
     )
 

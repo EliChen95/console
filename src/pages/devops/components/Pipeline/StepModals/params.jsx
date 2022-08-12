@@ -29,6 +29,7 @@ import { NumberInput } from 'components/Inputs'
 import { pick, set, isEmpty, get } from 'lodash'
 import { Modal, CodeEditor } from 'components/Base'
 import { safeParseJSON } from 'utils'
+import { observer } from 'mobx-react'
 
 import styles from './index.scss'
 
@@ -37,6 +38,7 @@ const boolMap = new Map([
   [false, 'false'],
 ])
 
+@observer
 export default class Params extends React.Component {
   static defaultProps = {
     visible: false,
@@ -47,6 +49,7 @@ export default class Params extends React.Component {
   constructor(props) {
     super(props)
     this.formRef = React.createRef()
+    this.query = {}
     this.state = {
       formData: {},
       value: '',
@@ -163,14 +166,20 @@ export default class Params extends React.Component {
     ]
   }
 
-  handleSecretChange = value => {
+  handleSecretChange = option => value => {
     const { formData } = this.state
     const res = this.props.store.credentialsList.data.filter(
       t => t.name === value
     )
+    if (res.length && option.postByQuery) {
+      this.query = {
+        secret: res[0].name,
+        secretNamespace: res[0].namespace,
+      }
+      return
+    }
     if (res.length) {
       set(formData, 'secret', res[0].name)
-      set(formData, 'secretNamespace', res[0].namespace)
     }
     this.setState({ formData })
   }
@@ -241,7 +250,7 @@ export default class Params extends React.Component {
               pagination={pick(credentialsList, ['page', 'limit', 'total'])}
               isLoading={credentialsList.isLoading}
               onFetch={this.getCredentialsListData}
-              onChange={this.handleSecretChange}
+              onChange={this.handleSecretChange(option)}
               optionRenderer={this.optionRender}
               valueRenderer={this.optionRender}
               searchable
@@ -316,7 +325,8 @@ export default class Params extends React.Component {
     this.formRef.current.validate(async () => {
       const jsonData = await store.getPipelineStepTempleJenkins(
         activeTask.name,
-        { ...initData, ...formData }
+        { ...initData, ...formData },
+        this.query
       )
       onAddStep(safeParseJSON(jsonData, {}))
     })
