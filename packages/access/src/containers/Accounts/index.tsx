@@ -5,7 +5,7 @@ import { Human } from '@kubed/icons';
 import { DataTable, formatTime } from '@ks-console/shared';
 import type { Column } from '@ks-console/shared';
 
-import { Avatar } from './styles';
+import { Avatar, CreateButton } from './styles';
 
 export default function Accounts() {
   const columns: Column[] = [
@@ -58,6 +58,11 @@ export default function Accounts() {
           const name = row?.metadata?.name;
           return globals.config.presetUsers.includes(name) || globals.user.username === name;
         }}
+        toolbarRight={
+          <CreateButton color="secondary" shadow>
+            {t('CREATE')}
+          </CreateButton>
+        }
       />
     </>
   );
