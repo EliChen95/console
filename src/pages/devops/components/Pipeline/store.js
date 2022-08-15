@@ -365,6 +365,7 @@ export default class Store extends BaseStore {
     const templateList = items.map(item => {
       const template = {}
       const annotations = get(item, 'metadata.annotations', {})
+
       template.icon = annotations['step.devops.kubesphere.io/icon']
       template.category = get(item, [
         'metadata',
@@ -398,6 +399,7 @@ export default class Store extends BaseStore {
           type: 'secret',
           display: 'Secret',
           postByQuery: true,
+          required: true,
         })
       }
       return template

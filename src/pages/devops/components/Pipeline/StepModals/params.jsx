@@ -26,6 +26,7 @@ import {
   Checkbox,
 } from '@kube-design/components'
 import { NumberInput } from 'components/Inputs'
+import { toJS } from 'mobx'
 import { pick, set, isEmpty, get } from 'lodash'
 import { Modal, CodeEditor } from 'components/Base'
 import { safeParseJSON } from 'utils'
@@ -89,20 +90,34 @@ export default class Params extends React.Component {
         : { formData: initData, initData, paramTypeMap, name }
     }
 
+    let result = {}
+
+    const data = toJS(edittingData.data)
     if (codeTypeName) {
-      return {
-        value: edittingData.value[codeTypeName],
-        initData,
-        paramTypeMap,
-        name,
+      result = {
+        value: (Array.isArray(data) ? data[0]?.value.value : data.value) || '',
+      }
+    } else {
+      result = {
+        formData: Array.isArray(data)
+          ? data.reduce((prev, arg) => {
+              const isBoolValue = paramTypeMap[arg.key] === 'bool'
+              prev[arg.key] = isBoolValue
+                ? arg.value.value === 'true'
+                : arg.value.value
+              return prev
+            }, {})
+          : Object.keys(initData).reduce(
+              (pre, key) => ({
+                ...pre,
+                [key]: data.value || '',
+              }),
+              {}
+            ),
       }
     }
-    const formData = edittingData.data.reduce((prev, arg) => {
-      const isBoolValue = paramTypeMap[arg.key] === 'bool'
-      prev[arg.key] = isBoolValue ? arg.value.value === 'true' : arg.value.value
-      return prev
-    }, {})
-    return { formData, initData, paramTypeMap, name }
+
+    return { ...result, initData, paramTypeMap, name }
   }
 
   getCredentialsListData = params => {
@@ -199,7 +214,7 @@ export default class Params extends React.Component {
     const { credentialsList, cdList, pipelineList } = this.props.store
     const defaultFormItemProps = {
       key: option.name,
-      label: option.display,
+      label: t(option.display),
       rules: [
         {
           required: option.required ?? false,
@@ -295,7 +310,7 @@ export default class Params extends React.Component {
               checked={get(this.state.formData, option.name, false)}
               onChange={this.handleCheckboxChange(option.name)}
             >
-              {option.display}
+              {t(option.display)}
             </Checkbox>
           </Form.Item>
         )
@@ -328,7 +343,10 @@ export default class Params extends React.Component {
         { ...initData, ...formData },
         this.query
       )
-      onAddStep(safeParseJSON(jsonData, {}))
+      onAddStep({
+        ...safeParseJSON(jsonData, {}),
+        taskName: activeTask.name,
+      })
     })
   }
 

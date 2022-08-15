@@ -77,7 +77,9 @@ export default class StepsEditor extends React.Component {
   async componentDidMount() {
     await this.getPipelineSteps()
     const { type } = this.props.store.edittingData
-    const matchTask = this.state.stepTemplates.filter(t => t.name === type)
+    const matchTask = this.state.stepTemplates.filter(
+      t => type && t.name === type
+    )
     if (matchTask.length) {
       this.setState({
         activeTask: matchTask[0],
