@@ -43,7 +43,13 @@ export default function Accounts() {
       render: value => (value ? formatTime(value) : t('NOT_LOGIN_YET')),
     },
   ];
-  const batchActions = <Button color="error">删除</Button>;
+  const batchActions = [
+    <Button key="delete" color="error">
+      {t('DELETE')}
+    </Button>,
+    <Button key="active">{t('ENABLE')}</Button>,
+    <Button key="disabled">{t('DISABLE')}</Button>,
+  ];
 
   return (
     <>
