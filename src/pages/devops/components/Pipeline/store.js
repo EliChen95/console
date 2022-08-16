@@ -69,7 +69,6 @@ const formatPipeLineJson = json => {
 
   return json
 }
-
 export default class Store extends BaseStore {
   credentialStore = new CredentialStore()
 
@@ -381,17 +380,19 @@ export default class Store extends BaseStore {
         annotations['devops.kubesphere.io/displayNameEN'] ||
         annotations.displayNameEN
 
-      template.parameters = get(item, 'spec.parameters', []).map(p => ({
-        ...p,
-        ...(p.options
-          ? {
-              options: safeParseJSON(p.options, []).map(opt => ({
-                label: t(opt.label),
-                value: opt.value,
-              })),
-            }
-          : {}),
-      }))
+      template.parameters = get(item, 'spec.parameters', []).map(p => {
+        return {
+          ...p,
+          ...(p.options
+            ? {
+                options: safeParseJSON(p.options, []).map(opt => ({
+                  label: t(opt.label),
+                  value: opt.value,
+                })),
+              }
+            : {}),
+        }
+      })
 
       if (!isEmpty(get(item, 'spec.secret', {}))) {
         template.parameters.push({

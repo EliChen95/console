@@ -27,9 +27,10 @@ import {
 } from '@kube-design/components'
 import { NumberInput } from 'components/Inputs'
 import { toJS } from 'mobx'
-import { pick, set, isEmpty, get } from 'lodash'
+import { pick, set, isEmpty, get, isUndefined } from 'lodash'
 import { Modal, CodeEditor } from 'components/Base'
 import { safeParseJSON } from 'utils'
+import { groovyToJS } from 'utils/devops'
 import { observer } from 'mobx-react'
 
 import styles from './index.scss'
@@ -39,6 +40,66 @@ const boolMap = new Map([
   [false, 'false'],
 ])
 
+const parseCheckoutData = data => {
+  const formData = data.data.reduce((prev, arg) => {
+    if (arg.key === 'scm') {
+      const str = arg.value.value
+      if (str) {
+        Object.assign(prev, groovyToJS(str))
+      }
+    }
+    prev[arg.key] = arg.value.value
+    return prev
+  }, {})
+  return { formData }
+}
+
+const parseWithCredientialData = data => {
+  const str = get(data, 'data.value', '')
+  if (str) {
+    const formData = groovyToJS(str)
+    const credentialType = setCredentialType(str)
+    return { formData, credentialType }
+  }
+  return null
+}
+
+const typesDict = {
+  secret_text: 'string',
+  username_password: 'usernamePassword',
+  ssh: 'sshUserPrivateKey',
+  kubeconfig: 'kubeconfigContent',
+}
+
+const setCredentialType = str => {
+  const typeReg = /\$\{\[([\w-]*)\(/
+  const type = str.match(typeReg) && str.match(typeReg)[1]
+  if (type) {
+    const credentialType = Object.entries(typesDict).find(
+      typeArr => typeArr[1] === type
+    )[0]
+    return credentialType
+  }
+  return null
+}
+
+const initialData = parameters => {
+  let codeName = ''
+  return parameters?.reduce((prev, { name, type, defaultValue }) => {
+    type === 'code' && (codeName = name)
+    return {
+      initData: {
+        ...(prev.initData || {}),
+        [name]: type === 'bool' ? defaultValue === 'true' : defaultValue || '',
+      },
+      typeMap: {
+        ...(prev.typeMap || {}),
+        [name]: type,
+      },
+      codeName,
+    }
+  }, {})
+}
 @observer
 export default class Params extends React.Component {
   static defaultProps = {
@@ -54,7 +115,7 @@ export default class Params extends React.Component {
     this.state = {
       formData: {},
       value: '',
-      paramTypeMap: {},
+      typeMap: {},
       initData: {},
       name: '',
     }
@@ -68,32 +129,25 @@ export default class Params extends React.Component {
 
   static getDerivedStateFromProps(nextProps, state) {
     const { activeTask, edittingData } = nextProps
-    const { name } = activeTask
+    const { name, parameters } = activeTask
     if (name === state.name) {
       return null
     }
+    const { initData, typeMap, codeName } = initialData(parameters)
 
-    let codeTypeName = ''
-    const initData = {}
-    const paramTypeMap = {}
-    activeTask.parameters?.forEach(
-      ({ name: paramName, type, defaultValue }) => {
-        initData[paramName] =
-          type === 'bool' ? defaultValue === 'true' : defaultValue || ''
-        paramTypeMap[paramName] = type
-        type === 'code' && (codeTypeName = paramName)
-      }
-    )
     if (isEmpty(edittingData)) {
-      return codeTypeName
-        ? { value: initData[codeTypeName], initData, paramTypeMap, name }
-        : { formData: initData, initData, paramTypeMap, name }
+      return codeName
+        ? { value: initData[codeName], initData, typeMap, name }
+        : { formData: initData, initData, typeMap, name }
     }
 
     let result = {}
-
     const data = toJS(edittingData.data)
-    if (codeTypeName) {
+    if (edittingData.type === 'svn-clone') {
+      result = parseCheckoutData(edittingData)
+    } else if (edittingData.type === 'with-credential') {
+      result = parseWithCredientialData(edittingData)
+    } else if (codeName) {
       result = {
         value: (Array.isArray(data) ? data[0]?.value.value : data.value) || '',
       }
@@ -101,10 +155,14 @@ export default class Params extends React.Component {
       result = {
         formData: Array.isArray(data)
           ? data.reduce((prev, arg) => {
-              const isBoolValue = paramTypeMap[arg.key] === 'bool'
-              prev[arg.key] = isBoolValue
-                ? arg.value.value === 'true'
-                : arg.value.value
+              prev[arg.key] = arg.value.value
+              const isBoolValue = typeMap[arg.key] === 'bool'
+              if (isBoolValue) {
+                prev[arg.key] =
+                  typeof arg.value.value === 'boolean'
+                    ? arg.value.value
+                    : arg.value.value === 'true'
+              }
               return prev
             }, {})
           : Object.keys(initData).reduce(
@@ -117,7 +175,7 @@ export default class Params extends React.Component {
       }
     }
 
-    return { ...result, initData, paramTypeMap, name }
+    return { ...(result || {}), initData, typeMap, name }
   }
 
   getCredentialsListData = params => {
@@ -326,13 +384,14 @@ export default class Params extends React.Component {
 
   handleOk = () => {
     const { activeTask, store, onAddStep } = this.props
-    const { paramTypeMap, initData } = this.state
+    const { typeMap, initData } = this.state
     const formData = Object.entries(this.formRef.current.getData()).reduce(
       (prev, [key, value]) => {
-        const isBoolValue = paramTypeMap[key] === 'bool'
+        const isBoolValue = typeMap[key] === 'bool'
+        const _value = isUndefined(value) ? '' : value
         return {
           ...prev,
-          [key]: isBoolValue ? boolMap.get(value) : (value || '').toString(),
+          [key]: isBoolValue ? boolMap.get(_value) : _value.toString(),
         }
       },
       {}
