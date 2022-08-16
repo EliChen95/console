@@ -22,6 +22,6 @@ export const nameValidator = debounce(async (params: PathParams) => {
     headers: { 'x-check-exist': true },
   });
 
-  if (resp.exist) return Promise.reject(t('EMAIL_EXISTS'));
+  if (resp.exist) return Promise.reject(t('USERNAME_EXISTS'));
   return Promise.resolve();
 }, 500);

@@ -41,7 +41,6 @@ function ListLayout() {
         <NavTitle
           icon={<Key variant="light" size={40} />}
           title={t('ACCESS_CONTROL')}
-          subtitle={t('PLATFORM_LEVEL_ACCESS_CONTROL')}
           style={{ marginBottom: '20px' }}
         />
         <NavMenu navs={navs} prefix="." pathname={location.pathname} />
