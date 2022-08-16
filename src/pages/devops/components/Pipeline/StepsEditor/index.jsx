@@ -40,12 +40,7 @@ const AgentType = [
 ]
 
 const stepNameMapper = {
-  script: 'groovy-script',
-  build: 'pipeline-trigger',
-  container: 'container-switch',
   sh: 'shell',
-  checkout: 'svn-clone',
-  git: 'git-clone',
 }
 
 @observer
