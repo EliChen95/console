@@ -1,11 +1,12 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Banner, Button, Field, StatusDot } from '@kubed/components';
+import { Banner, Field } from '@kubed/components';
 import { Human } from '@kubed/icons';
-import { DataTable, formatTime } from '@ks-console/shared';
+import { DataTable, formatTime, StatusIndicator } from '@ks-console/shared';
 import type { Column } from '@ks-console/shared';
 
-import { Avatar, CreateButton } from './styles';
+import UserCreateModal from './UserCreateModal';
+import { Avatar, CreateButton, BatchActionButton } from './styles';
 
 export default function Accounts() {
   const columns: Column[] = [
@@ -26,7 +27,7 @@ export default function Accounts() {
       canHide: true,
       width: '20%',
       render: value => (
-        <StatusDot color="success">{t(`USER_${(value ?? '').toUpperCase()}`)}</StatusDot>
+        <StatusIndicator type={value}>{t(`USER_${(value ?? '').toUpperCase()}`)}</StatusIndicator>
       ),
     },
     {
@@ -44,11 +45,11 @@ export default function Accounts() {
     },
   ];
   const batchActions = [
-    <Button key="delete" color="error">
+    <BatchActionButton key="delete" color="error">
       {t('DELETE')}
-    </Button>,
-    <Button key="active">{t('ENABLE')}</Button>,
-    <Button key="disabled">{t('DISABLE')}</Button>,
+    </BatchActionButton>,
+    <BatchActionButton key="active">{t('ENABLE')}</BatchActionButton>,
+    <BatchActionButton key="disabled">{t('DISABLE')}</BatchActionButton>,
   ];
 
   return (
@@ -70,6 +71,7 @@ export default function Accounts() {
           </CreateButton>
         }
       />
+      <UserCreateModal />
     </>
   );
 }
