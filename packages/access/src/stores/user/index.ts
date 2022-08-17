@@ -1,6 +1,6 @@
 import { useUrl } from '@ks-console/shared';
 
-import type { GetPathParams } from '../types';
+import type { GetPathParams } from '../../types';
 
 const module = 'users';
 
