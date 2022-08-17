@@ -143,9 +143,10 @@ export default class Params extends React.Component {
 
     let result = {}
     const data = toJS(edittingData.data)
+    console.log(edittingData)
     if (edittingData.type === 'checkout') {
       result = parseCheckoutData(edittingData)
-    } else if (edittingData.type === 'withcredential') {
+    } else if (edittingData.type === 'withcredentials') {
       result = parseWithCredientialData(edittingData)
     } else if (codeName) {
       result = {
@@ -402,10 +403,9 @@ export default class Params extends React.Component {
         { ...initData, ...formData },
         this.query
       )
-      onAddStep({
-        ...safeParseJSON(jsonData, {}),
-        taskName: activeTask.name,
-      })
+      try {
+        onAddStep(JSON.parse(jsonData))
+      } catch (e) {}
     })
   }
 
