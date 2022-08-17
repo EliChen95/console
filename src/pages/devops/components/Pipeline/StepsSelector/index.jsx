@@ -256,7 +256,7 @@ export default class StepsEditor extends React.Component {
     }
 
     const allTask = this.state.stepTemplates
-      .filter(t => !t.category)
+      .filter(t => t.category)
       .reduce((prev, task) => {
         const _tasks = prev[task.category] || []
         return {

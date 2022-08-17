@@ -143,9 +143,9 @@ export default class Params extends React.Component {
 
     let result = {}
     const data = toJS(edittingData.data)
-    if (edittingData.type === 'svn-clone') {
+    if (edittingData.type === 'checkout') {
       result = parseCheckoutData(edittingData)
-    } else if (edittingData.type === 'with-credential') {
+    } else if (edittingData.type === 'withcredential') {
       result = parseWithCredientialData(edittingData)
     } else if (codeName) {
       result = {
