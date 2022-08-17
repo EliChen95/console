@@ -255,18 +255,18 @@ export default class StepsEditor extends React.Component {
       )
     }
 
-    const allTask = this.state.stepTemplates.reduce((prev, task) => {
-      const _tasks = prev[task.category] || []
-      return {
-        ...prev,
-        All: prev.All ? [...prev.All, task] : [task],
-        [task.category]: [..._tasks, task],
-      }
-    }, {})
+    const allTask = this.state.stepTemplates
+      .filter(t => !t.category)
+      .reduce((prev, task) => {
+        const _tasks = prev[task.category] || []
+        return {
+          ...prev,
+          All: prev.All ? [...prev.All, task] : [task],
+          [task.category]: [..._tasks, task],
+        }
+      }, {})
     const others = this.state.stepTemplates.filter(t => !t.category)
-    if (others.length) {
-      allTask.others = others
-    }
+    others.length && (allTask.others = others)
 
     return (
       <div className={siderStyle.sheet}>
