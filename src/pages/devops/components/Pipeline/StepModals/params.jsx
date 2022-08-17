@@ -29,7 +29,6 @@ import { NumberInput } from 'components/Inputs'
 import { toJS } from 'mobx'
 import { pick, set, isEmpty, get, isUndefined } from 'lodash'
 import { Modal, CodeEditor } from 'components/Base'
-import { safeParseJSON } from 'utils'
 import { groovyToJS } from 'utils/devops'
 import { observer } from 'mobx-react'
 
@@ -143,7 +142,6 @@ export default class Params extends React.Component {
 
     let result = {}
     const data = toJS(edittingData.data)
-    console.log(edittingData)
     if (edittingData.type === 'checkout') {
       result = parseCheckoutData(edittingData)
     } else if (edittingData.type === 'withcredentials') {
@@ -183,13 +181,15 @@ export default class Params extends React.Component {
     return this.props.store.getCredentials(params)
   }
 
-  getCredentialsList = () => {
+  getCredentialsList = option => {
     return [
       ...this.props.store.credentialsList.data.map(credential => ({
         label: credential.name,
         value: credential.name,
         type: credential.type,
-        disabled: false,
+        disabled: option.secretType
+          ? credential.type !== option.secretType
+          : false,
       })),
     ]
   }
@@ -320,7 +320,7 @@ export default class Params extends React.Component {
           >
             <Select
               name={option.name}
-              options={this.getCredentialsList()}
+              options={this.getCredentialsList(option)}
               pagination={pick(credentialsList, ['page', 'limit', 'total'])}
               isLoading={credentialsList.isLoading}
               onFetch={this.getCredentialsListData}

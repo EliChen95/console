@@ -25,8 +25,8 @@ import CredentialStore from 'stores/devops/credential'
 import BaseStore from 'stores/devops'
 import PipelineStore from 'stores/devops/pipelines'
 import CDStore from 'stores/cd'
-
 import { generateId, safeParseJSON } from 'utils'
+import { CREDENTIAL_DISPLAY_KEY } from 'utils/constants'
 
 const formatPipeLineJson = json => {
   if (!get(json, 'pipeline.stages')) return
@@ -395,12 +395,15 @@ export default class Store extends BaseStore {
       })
 
       if (!isEmpty(get(item, 'spec.secret', {}))) {
+        const secretType =
+          CREDENTIAL_DISPLAY_KEY[item.spec.secret.type?.split('/')[1]]
         template.parameters.push({
           name: 'secret',
           type: 'secret',
           display: 'Secret',
           postByQuery: true,
           required: true,
+          secretType,
         })
       }
       return template
