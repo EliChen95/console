@@ -1,39 +1,34 @@
-const moduleName = 'globalroles';
+import { merge } from 'lodash';
+import { useUrl, useList } from '@ks-console/shared';
+import type { UseListOptions } from '@ks-console/shared';
 
-interface GetPathOptions {
-  cluster?: string;
-  workspace?: string;
-  namespace?: string;
-  devops?: string;
+import type { GetPathParams } from '../types';
+
+const module = 'globalroles';
+
+const { getPath } = useUrl({ module });
+
+export function getResourceUrl(params?: GetPathParams) {
+  return `kapis/iam.kubesphere.io/v1alpha2${getPath(params)}/${module}`;
 }
 
-function getPath(options?: GetPathOptions) {
-  const cluster = options?.cluster;
-  const workspace = options?.workspace;
-  const namespace = options?.namespace;
-  const devops = options?.devops;
-
-  let path = '';
-
-  if (cluster) {
-    path += `/klusters/${cluster}`;
-  }
-
-  if (namespace) {
-    return `${path}/namespaces/${namespace}`;
-  }
-
-  if (devops) {
-    return `${path}/devops/${devops}`;
-  }
-
-  if (workspace) {
-    return `/workspaces/${workspace}`;
-  }
-
-  return path;
+interface Role {
+  apiVersion: string;
 }
 
-export function getResourceUrl(params?: GetPathOptions) {
-  return `kapis/iam.kubesphere.io/v1alpha2${getPath(params)}/${moduleName}`;
+export function useRoles(options?: Omit<UseListOptions<Role>, 'url'>) {
+  // TODO: missing params ?
+  const url = getResourceUrl();
+  const params = {
+    annotation: 'kubesphere.io/creator',
+  };
+  const opts = merge(
+    {},
+    {
+      url,
+      params,
+    },
+    options,
+  );
+  return useList(opts);
 }

@@ -5,6 +5,7 @@ import { Human } from '@kubed/icons';
 import { DataTable, formatTime, StatusIndicator } from '@ks-console/shared';
 import type { Column } from '@ks-console/shared';
 
+import { getResourceUrl } from '../../stores/user';
 import UserCreateModal from './UserCreateModal';
 import { Avatar, CreateButton, BatchActionButton } from './styles';
 
@@ -44,6 +45,8 @@ export default function Accounts() {
       render: value => (value ? formatTime(value) : t('NOT_LOGIN_YET')),
     },
   ];
+  // TODO: missing params ?
+  const url = getResourceUrl();
   const batchActions = [
     <BatchActionButton key="delete" color="error">
       {t('DELETE')}
@@ -59,7 +62,7 @@ export default function Accounts() {
         columns={columns}
         tableName="users"
         rowKey="name"
-        url="kapis/iam.kubesphere.io/v1alpha2/users"
+        url={url}
         batchActions={batchActions}
         disableRowSelect={row => {
           const name = row?.metadata?.name;

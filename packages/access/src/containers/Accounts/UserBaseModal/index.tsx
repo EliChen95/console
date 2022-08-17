@@ -3,6 +3,7 @@ import { Modal, FormItem, Input } from '@kubed/components';
 import type { FormItemProps } from '@kubed/components';
 import { Human } from '@kubed/icons';
 
+import { useRoles } from '../../../stores/role';
 import { StyledForm } from './styles';
 
 type Rules = FormItemProps['rules'];
@@ -23,6 +24,10 @@ export interface UserBaseModalProps {
 }
 
 export default function UserBaseModal({ title, formFields }: UserBaseModalProps) {
+  useRoles({
+    params: { limit: -1, sortBy: 'createTime' },
+  });
+
   return (
     <Modal visible titleIcon={<Human size={20} />} title={title} width={691}>
       <StyledForm>
