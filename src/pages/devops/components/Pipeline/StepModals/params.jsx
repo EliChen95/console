@@ -19,20 +19,24 @@
 import React from 'react'
 import {
   Form,
-  Tag,
   Select,
   Input,
   TextArea,
   Checkbox,
+  Notify,
 } from '@kube-design/components'
 import { NumberInput } from 'components/Inputs'
 import { toJS } from 'mobx'
-import { pick, set, isEmpty, get, isUndefined } from 'lodash'
+import { set, isEmpty, get, isUndefined } from 'lodash'
 import { Modal, CodeEditor } from 'components/Base'
-import { groovyToJS } from 'utils/devops'
+import { groovyToJS, parseCondition } from 'utils/devops'
 import { observer } from 'mobx-react'
+import { CREDENTIAL_KEY } from 'utils/constants'
 
 import styles from './index.scss'
+import PipelineSelect from './components/pipeline'
+import CDSelect from './components/application'
+import SecretSelect from './components/credential'
 
 const boolMap = new Map([
   [true, 'true'],
@@ -56,8 +60,12 @@ const parseCheckoutData = data => {
 const parseWithCredientialData = data => {
   const str = get(data, 'data.value', '')
   if (str) {
-    const formData = groovyToJS(str)
     const credentialType = setCredentialType(str)
+    const formData = {
+      ...groovyToJS(str),
+      type: `credential.devops.kubesphere.io/${CREDENTIAL_KEY[credentialType]}`,
+    }
+
     return { formData, credentialType }
   }
   return null
@@ -101,7 +109,7 @@ const initialData = parameters => {
 }
 @observer
 export default class Params extends React.Component {
-  static defaultProps = {
+  static formProps = {
     visible: false,
     onOk() {},
     onCancel() {},
@@ -120,20 +128,14 @@ export default class Params extends React.Component {
     }
   }
 
-  componentDidMount() {
-    this.getCDListData()
-    this.getCredentialsListData()
-    this.getPipelineListData()
-  }
-
   static getDerivedStateFromProps(nextProps, state) {
     const { activeTask, edittingData } = nextProps
     const { name, parameters } = activeTask
     if (name === state.name) {
       return null
     }
-    const { initData, typeMap, codeName } = initialData(parameters)
 
+    const { initData, typeMap, codeName } = initialData(parameters)
     if (isEmpty(edittingData)) {
       return codeName
         ? { value: initData[codeName], initData, typeMap, name }
@@ -141,10 +143,10 @@ export default class Params extends React.Component {
     }
 
     let result = {}
-    const data = toJS(edittingData.data)
-    if (edittingData.type === 'checkout') {
+    const { data, type } = toJS(edittingData)
+    if (type === 'checkout') {
       result = parseCheckoutData(edittingData)
-    } else if (edittingData.type === 'withcredentials') {
+    } else if (type === 'withcredentials') {
       result = parseWithCredientialData(edittingData)
     } else if (codeName) {
       result = {
@@ -177,88 +179,7 @@ export default class Params extends React.Component {
     return { ...(result || {}), initData, typeMap, name }
   }
 
-  getCredentialsListData = params => {
-    return this.props.store.getCredentials(params)
-  }
-
-  getCredentialsList = option => {
-    return [
-      ...this.props.store.credentialsList.data.map(credential => ({
-        label: credential.name,
-        value: credential.name,
-        type: credential.type,
-        disabled: option.secretType
-          ? credential.type !== option.secretType
-          : false,
-      })),
-    ]
-  }
-
-  optionRender = ({ label, type, disabled }) => (
-    <span style={{ display: 'flex', alignItem: 'center' }}>
-      {label}&nbsp;&nbsp;
-      <Tag type={disabled ? '' : 'warning'}>
-        {type === 'ssh' ? 'SSH' : t(type)}
-      </Tag>
-    </span>
-  )
-
-  renderCredentialDesc() {
-    return (
-      <p>
-        {t('SELECT_CREDENTIAL_DESC')}
-        <span className={styles.clickable} onClick={this.props.showCredential}>
-          {t('CREATE_CREDENTIAL')}
-        </span>
-      </p>
-    )
-  }
-
-  getCDListData = params => {
-    return this.props.store.getCDListData(params)
-  }
-
-  getCDList = () => {
-    return [
-      ...this.props.store.cdList.data.map(item => ({
-        label: item.name,
-        value: item.name,
-      })),
-    ]
-  }
-
-  getPipelineListData = params => {
-    return this.props.store.getPipelines(params)
-  }
-
-  getPipelineList = () => {
-    return [
-      ...this.props.store.pipelineList.data.map(pipeline => ({
-        label: pipeline.name,
-        value: pipeline.name,
-      })),
-    ]
-  }
-
-  handleSecretChange = option => value => {
-    const { formData } = this.state
-    const res = this.props.store.credentialsList.data.filter(
-      t => t.name === value
-    )
-    if (res.length && option.postByQuery) {
-      this.query = {
-        secret: res[0].name,
-        secretNamespace: res[0].namespace,
-      }
-      return
-    }
-    if (res.length) {
-      set(formData, 'secret', res[0].name)
-    }
-    this.setState({ formData })
-  }
-
-  handleCodeEditorChange = name => value => {
+  handleChange = name => value => {
     const { formData } = this.state
     set(formData, name, value)
   }
@@ -269,9 +190,47 @@ export default class Params extends React.Component {
     this.setState({ formData })
   }
 
+  handleSecretChange = option => value => {
+    const { formData } = this.state
+    const { activeTask, store } = this.props
+    const hasType = activeTask.parameters.filter(
+      t => t.name === 'type' && t.type === 'hidden'
+    )
+    const res = store.credentialsList.data.filter(t => t.name === value)
+    if (!res.length) {
+      this.query = {}
+      set(formData, 'type', '')
+      set(formData, 'secret', '')
+      this.setState({ formData })
+      return
+    }
+    if (option.postByQuery) {
+      this.query = {
+        secret: res[0].name,
+        secretNamespace: res[0].namespace,
+      }
+      return
+    }
+    if (hasType) {
+      set(
+        formData,
+        'type',
+        `credential.devops.kubesphere.io/${CREDENTIAL_KEY[res[0].type]}`
+      )
+    }
+    set(formData, 'secret', res[0].name)
+    this.setState({ formData })
+  }
+
   renderFormItem(option) {
-    const { credentialsList, cdList, pipelineList } = this.props.store
-    const defaultFormItemProps = {
+    if (
+      option.condition &&
+      !parseCondition(option.condition, this.state.formData)
+    ) {
+      return null
+    }
+    const { store } = this.props
+    const formProps = {
       key: option.name,
       label: t(option.display),
       rules: [
@@ -284,69 +243,35 @@ export default class Params extends React.Component {
     switch (option.type) {
       case 'pipeline':
         return (
-          <Form.Item {...defaultFormItemProps}>
-            <Select
-              name={option.name}
-              options={this.getPipelineList()}
-              pagination={pick(pipelineList, ['page', 'limit', 'total'])}
-              isLoading={pipelineList.isLoading}
-              onFetch={this.getPipelineListData}
-              searchable
-              clearable
-            />
-          </Form.Item>
+          <PipelineSelect key={option.name} option={option} store={store} />
         )
       case 'application':
-        return (
-          <Form.Item {...defaultFormItemProps}>
-            <Select
-              name={option.name}
-              options={this.getCDList()}
-              pagination={pick(cdList, ['page', 'limit', 'total'])}
-              isLoading={cdList.isLoading}
-              onFetch={this.getCDListData}
-              searchable
-              clearable
-            />
-          </Form.Item>
-        )
+        return <CDSelect key={option.name} option={option} store={store} />
       case 'secret':
         return (
-          <Form.Item
-            {...{
-              ...defaultFormItemProps,
-              desc: this.renderCredentialDesc(),
-            }}
-          >
-            <Select
-              name={option.name}
-              options={this.getCredentialsList(option)}
-              pagination={pick(credentialsList, ['page', 'limit', 'total'])}
-              isLoading={credentialsList.isLoading}
-              onFetch={this.getCredentialsListData}
-              onChange={this.handleSecretChange(option)}
-              optionRenderer={this.optionRender}
-              valueRenderer={this.optionRender}
-              searchable
-              clearable
-            />
-          </Form.Item>
+          <SecretSelect
+            key={option.name}
+            option={option}
+            store={store}
+            onChange={this.handleSecretChange(option)}
+            showCredential={this.props.showCredential}
+          />
         )
       case 'number':
         return (
-          <Form.Item {...defaultFormItemProps}>
+          <Form.Item {...formProps}>
             <NumberInput name={option.name} />
           </Form.Item>
         )
       case 'text':
         return (
-          <Form.Item {...defaultFormItemProps}>
+          <Form.Item {...formProps}>
             <TextArea name={option.name} rows={8} />
           </Form.Item>
         )
       case 'enum':
         return (
-          <Form.Item {...defaultFormItemProps}>
+          <Form.Item {...formProps}>
             <Select name={option.name} options={option.options || []} />
           </Form.Item>
         )
@@ -363,7 +288,7 @@ export default class Params extends React.Component {
         )
       case 'bool':
         return (
-          <Form.Item {...{ ...defaultFormItemProps, label: '', desc: '' }}>
+          <Form.Item {...{ ...formProps, label: '', desc: '' }}>
             <Checkbox
               name={option.name}
               checked={get(this.state.formData, option.name, false)}
@@ -373,10 +298,12 @@ export default class Params extends React.Component {
             </Checkbox>
           </Form.Item>
         )
+      case 'hidden':
+        return null
       case 'string':
       default:
         return (
-          <Form.Item {...defaultFormItemProps}>
+          <Form.Item {...formProps}>
             <Input name={option.name} />
           </Form.Item>
         )
@@ -384,7 +311,7 @@ export default class Params extends React.Component {
   }
 
   handleOk = () => {
-    const { activeTask, store, onAddStep } = this.props
+    const { activeTask, store, onAddStep, onCancel } = this.props
     const { typeMap, initData } = this.state
     const formData = Object.entries(this.formRef.current.getData()).reduce(
       (prev, [key, value]) => {
@@ -405,7 +332,10 @@ export default class Params extends React.Component {
       )
       try {
         onAddStep(JSON.parse(jsonData))
-      } catch (e) {}
+      } catch (e) {
+        Notify.error({ content: t('ERROR') })
+        onCancel()
+      }
     })
   }
 

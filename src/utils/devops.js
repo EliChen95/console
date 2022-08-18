@@ -131,3 +131,58 @@ export const getLanguageIcon = (name, defaultIcon) => {
   ]
   return LEGO_LANGUAGE_ICON.includes(name) ? name : defaultIcon
 }
+
+const parsePhrase = phrase => {
+  const reg = /(.+)(>|>=|==|!=)(.+)/
+  const res = phrase.match(reg)
+  const [, key, operator, value] = res
+  return {
+    key: key.replace('.param.', ''),
+    operator,
+    value,
+  }
+}
+
+const compare = (cond, data) => {
+  switch (cond.operator) {
+    case '==':
+      return data[cond.key] === cond.value
+    case '>=':
+      return data[cond.key] >= cond.value
+    case '<=':
+      return data[cond.key] <= cond.value
+    case '!=':
+      return data[cond.key] !== cond.value
+    default:
+      return false
+  }
+}
+
+export const parseCondition = (cond, data) => {
+  try {
+    const reg = /(.+?)(&&|\|\|)/g
+    const result = cond.match(reg)
+    if (!result) {
+      return compare(parsePhrase(cond), data)
+    }
+    const condList = [
+      ...result.map(match => match.slice(0, -2)),
+      cond.slice(result.reduce((pre, cur) => pre + cur.length, 0)),
+    ].map(parsePhrase)
+    const operator = result.map(match => match.slice(-2))
+    return operator.reduce((pre, cur, index) => {
+      const left = index === 0 ? compare(condList[0], data) : pre
+      const right = compare(data, condList[index + 1])
+      switch (cur) {
+        case '&&':
+          return left && right
+        case '||':
+          return left || right
+        default:
+          return false
+      }
+    }, false)
+  } catch (e) {
+    return false
+  }
+}
