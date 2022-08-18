@@ -172,7 +172,7 @@ export const parseCondition = (cond, data) => {
     const operator = result.map(match => match.slice(-2))
     return operator.reduce((pre, cur, index) => {
       const left = index === 0 ? compare(condList[0], data) : pre
-      const right = compare(data, condList[index + 1])
+      const right = compare(condList[index + 1], data)
       switch (cur) {
         case '&&':
           return left && right
