@@ -176,7 +176,6 @@ export default class Params extends React.Component {
     const { parameters } = this.props.activeTask
     const secretOption = parameters?.filter(t => t.type === 'secret')[0]
     if (secretOption) {
-      console.log(secretOption)
       const change = this.handleSecretChange(secretOption)
       change(this.state.formData[secretOption.name])
     }
