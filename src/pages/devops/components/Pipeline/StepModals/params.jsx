@@ -156,13 +156,12 @@ export default class Params extends React.Component {
       result = {
         formData: Array.isArray(data)
           ? data.reduce((prev, arg) => {
-              prev[arg.key] = arg.value.value
+              const value = arg.value.value
+              prev[arg.key] = value
               const isBoolValue = typeMap[arg.key] === 'bool'
               if (isBoolValue) {
                 prev[arg.key] =
-                  typeof arg.value.value === 'boolean'
-                    ? arg.value.value
-                    : arg.value.value === 'true'
+                  typeof value === 'boolean' ? value : value === 'true'
               }
               return prev
             }, {})
@@ -179,7 +178,7 @@ export default class Params extends React.Component {
     return { ...(result || {}), initData, typeMap, name }
   }
 
-  handleChange = name => value => {
+  handleCodeEditorChange = name => value => {
     const { formData } = this.state
     set(formData, name, value)
   }
