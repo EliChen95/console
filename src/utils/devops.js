@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Affero General Public License
  * along with KubeSphere Console.  If not, see <https://www.gnu.org/licenses/>.
  */
-import { set, cloneDeep } from 'lodash'
+import { get, set, cloneDeep } from 'lodash'
 
 const deleteUnenableAttrs = data => {
   /* eslint-disable no-unused-vars */
@@ -144,15 +144,16 @@ const parsePhrase = phrase => {
 }
 
 const compare = (cond, data) => {
+  const value = get(data, cond.key)
   switch (cond.operator) {
     case '==':
-      return data[cond.key] === cond.value
+      return value === cond.value
     case '>=':
-      return data[cond.key] >= cond.value
+      return value >= cond.value
     case '<=':
-      return data[cond.key] <= cond.value
+      return value <= cond.value
     case '!=':
-      return data[cond.key] !== cond.value
+      return value !== cond.value
     default:
       return false
   }

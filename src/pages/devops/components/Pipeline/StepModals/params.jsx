@@ -43,8 +43,8 @@ const boolMap = new Map([
   [false, 'false'],
 ])
 
-const parseCheckoutData = data => {
-  const formData = data.data.reduce((prev, arg) => {
+const parseCheckoutData = data =>
+  data.data.reduce((prev, arg) => {
     if (arg.key === 'scm') {
       const str = arg.value.value
       if (str) {
@@ -54,21 +54,17 @@ const parseCheckoutData = data => {
     prev[arg.key] = arg.value.value
     return prev
   }, {})
-  return { formData }
-}
 
 const parseWithCredientialData = data => {
   const str = get(data, 'data.value', '')
   if (str) {
     const credentialType = setCredentialType(str)
-    const formData = {
+    return {
       ...groovyToJS(str),
       type: `credential.devops.kubesphere.io/${CREDENTIAL_KEY[credentialType]}`,
     }
-
-    return { formData, credentialType }
   }
-  return null
+  return {}
 }
 
 const typesDict = {
@@ -91,21 +87,23 @@ const setCredentialType = str => {
 }
 
 const initialData = parameters => {
-  let codeName = ''
-  return parameters?.reduce((prev, { name, type, defaultValue }) => {
-    type === 'code' && (codeName = name)
-    return {
-      initData: {
-        ...(prev.initData || {}),
-        [name]: type === 'bool' ? defaultValue === 'true' : defaultValue || '',
-      },
-      typeMap: {
-        ...(prev.typeMap || {}),
-        [name]: type,
-      },
-      codeName,
-    }
-  }, {})
+  return parameters?.reduce(
+    (prev, { name, type, defaultValue }) => {
+      return {
+        initData: {
+          ...prev.initData,
+          [name]:
+            type === 'bool' ? defaultValue === 'true' : defaultValue || '',
+        },
+        typeMap: {
+          ...prev.typeMap,
+          [name]: type,
+        },
+        codeKey: type === 'code' ? name : prev.codeKey,
+      }
+    },
+    { initData: {}, typeMap: {}, codeKey: '' }
+  )
 }
 @observer
 export default class Params extends React.Component {
@@ -135,47 +133,53 @@ export default class Params extends React.Component {
       return null
     }
 
-    const { initData, typeMap, codeName } = initialData(parameters)
+    const { initData, typeMap, codeKey } = initialData(parameters)
     if (isEmpty(edittingData)) {
-      return codeName
-        ? { value: initData[codeName], initData, typeMap, name }
+      return codeKey
+        ? { value: initData[codeKey], initData, typeMap, name }
         : { formData: initData, initData, typeMap, name }
     }
 
-    let result = {}
+    let formData = {}
+    let value = ''
     const { data, type } = toJS(edittingData)
     if (type === 'checkout') {
-      result = parseCheckoutData(edittingData)
+      formData = parseCheckoutData(edittingData)
     } else if (type === 'withcredentials') {
-      result = parseWithCredientialData(edittingData)
-    } else if (codeName) {
-      result = {
-        value: (Array.isArray(data) ? data[0]?.value.value : data.value) || '',
-      }
+      formData = parseWithCredientialData(edittingData)
+    } else if (codeKey) {
+      value = (Array.isArray(data) ? data[0]?.value?.value : data.value) || ''
+    } else if (Array.isArray(data)) {
+      formData = data.reduce((prev, arg) => {
+        const val = arg.value.value
+        prev[arg.key] = val
+        const isBoolValue = typeMap[arg.key] === 'bool'
+        if (isBoolValue) {
+          prev[arg.key] = typeof val === 'boolean' ? val : val === 'true'
+        }
+        return prev
+      }, {})
     } else {
-      result = {
-        formData: Array.isArray(data)
-          ? data.reduce((prev, arg) => {
-              const value = arg.value.value
-              prev[arg.key] = value
-              const isBoolValue = typeMap[arg.key] === 'bool'
-              if (isBoolValue) {
-                prev[arg.key] =
-                  typeof value === 'boolean' ? value : value === 'true'
-              }
-              return prev
-            }, {})
-          : Object.keys(initData).reduce(
-              (pre, key) => ({
-                ...pre,
-                [key]: data.value || '',
-              }),
-              {}
-            ),
-      }
+      formData = Object.keys(initData).reduce(
+        (pre, key) => ({
+          ...pre,
+          [key]: data.value || '',
+        }),
+        {}
+      )
     }
 
-    return { ...(result || {}), initData, typeMap, name }
+    return { formData, value, initData, typeMap, name }
+  }
+
+  componentDidMount() {
+    const { parameters } = this.props.activeTask
+    const secretOption = parameters?.filter(t => t.type === 'secret')[0]
+    if (secretOption) {
+      console.log(secretOption)
+      const change = this.handleSecretChange(secretOption)
+      change(this.state.formData[secretOption.name])
+    }
   }
 
   handleCodeEditorChange = name => value => {
@@ -191,33 +195,25 @@ export default class Params extends React.Component {
 
   handleSecretChange = option => value => {
     const { formData } = this.state
-    const { activeTask, store } = this.props
-    const hasType = activeTask.parameters.filter(
-      t => t.name === 'type' && t.type === 'hidden'
-    )
+    const { store } = this.props
     const res = store.credentialsList.data.filter(t => t.name === value)
     if (!res.length) {
       this.query = {}
-      set(formData, 'type', '')
-      set(formData, 'secret', '')
-      this.setState({ formData })
-      return
-    }
-    if (option.postByQuery) {
+      set(formData, option.name, {
+        name: '',
+        type: '',
+      })
+    } else if (option.postByQuery) {
       this.query = {
         secret: res[0].name,
         secretNamespace: res[0].namespace,
       }
-      return
+    } else {
+      set(formData, option.name, {
+        name: res[0].name,
+        type: `credential.devops.kubesphere.io/${CREDENTIAL_KEY[res[0].type]}`,
+      })
     }
-    if (hasType) {
-      set(
-        formData,
-        'type',
-        `credential.devops.kubesphere.io/${CREDENTIAL_KEY[res[0].type]}`
-      )
-    }
-    set(formData, 'secret', res[0].name)
     this.setState({ formData })
   }
 
@@ -315,10 +311,10 @@ export default class Params extends React.Component {
     const formData = Object.entries(this.formRef.current.getData()).reduce(
       (prev, [key, value]) => {
         const isBoolValue = typeMap[key] === 'bool'
-        const _value = isUndefined(value) ? '' : value
+        const _value = typeof value === 'number' ? value.toString() : value
         return {
           ...prev,
-          [key]: isBoolValue ? boolMap.get(_value) : _value.toString(),
+          [key]: isBoolValue ? boolMap.get(_value) : _value,
         }
       },
       {}

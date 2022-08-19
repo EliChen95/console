@@ -83,7 +83,7 @@ export default class SecretSelect extends Component {
     return (
       <Form.Item {...formProps}>
         <Select
-          name={option.name}
+          name={`${option.name}.name`}
           options={this.getCredentialsList(option)}
           pagination={pick(credentialsList, ['page', 'limit', 'total'])}
           isLoading={credentialsList.isLoading}
