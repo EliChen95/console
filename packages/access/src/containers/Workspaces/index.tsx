@@ -1,7 +1,7 @@
 import React, { useRef } from 'react';
-import { Link } from 'react-router-dom';
-import { Banner, Button, Field, Loading } from '@kubed/components';
-import { Enterprise } from '@kubed/icons';
+import { Link, useLocation } from 'react-router-dom';
+import { Banner, Button, Dropdown, Field, Menu, MenuItem } from '@kubed/components';
+import { Enterprise, More, Trash, Pen } from '@kubed/icons';
 import {
   DataTable,
   Column,
@@ -17,6 +17,8 @@ import styled from 'styled-components';
 import { ClusterWrapper, ClusterStore } from '@ks-console/clusters';
 import { getListUrl, workspaceMapper } from '../../stores/workspace';
 
+const { fetchList } = ClusterStore;
+
 export const CreateButton = styled(Button)`
   min-width: 96px;
   margin-left: 12px;
@@ -29,13 +31,14 @@ export const BatchActionButton = styled(Button)`
   }
 `;
 
-const { fetchList } = ClusterStore;
 export default function Workspaces(): JSX.Element {
   const url = getListUrl();
   const tableRef = useRef();
   const { isLoading: isClusterLoading, data: clustersData = [] } = fetchList({
     limit: -1,
   });
+  const isSystemWorkspaces = (row?: Record<string, any>) =>
+    get(row, 'name') === globals.config.systemWorkspace;
 
   const columns: Column[] = [
     {
@@ -62,6 +65,27 @@ export default function Workspaces(): JSX.Element {
       canHide: true,
       width: 250,
       render: time => formatTime(time),
+    },
+    {
+      id: 'option',
+      title: '',
+      width: 20,
+      render: (value, row) =>
+        !isSystemWorkspaces(row) ? (
+          <Dropdown
+            placement="bottom-end"
+            content={
+              <Menu>
+                <MenuItem icon={<Pen />}>{t('EDIT_INFORMATION')}</MenuItem>
+                <MenuItem icon={<Trash />}>{t('DELETE')}</MenuItem>
+              </Menu>
+            }
+          >
+            <Button variant="text" radius="lg">
+              <More size={16} />
+            </Button>
+          </Dropdown>
+        ) : null,
     },
   ];
   if (isMultiCluster()) {
@@ -99,7 +123,7 @@ export default function Workspaces(): JSX.Element {
           </CreateButton>
         }
         onSelect={onSelect}
-        disableRowSelect={row => get(row, 'name') === globals.config.systemWorkspace}
+        disableRowSelect={isSystemWorkspaces}
         ref={tableRef}
       />
     </>
