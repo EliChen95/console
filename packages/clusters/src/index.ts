@@ -5,3 +5,5 @@ const pluginConfig = {
 };
 
 export default pluginConfig;
+export * from './stores';
+export * from './components';

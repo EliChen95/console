@@ -59,7 +59,7 @@ const getTenantUrl = (params = {}) =>
 export const fetchList = (params: Record<string, any>, from?: string) => {
   if (!isMultiCluster()) {
     return {
-      data: [Constants.DEFAULT_CLUSTER],
+      data: [Constants.DEFAULT_CLUSTER].map(clusterMapper),
       isLoading: false,
       total: 1,
       refresh() {},

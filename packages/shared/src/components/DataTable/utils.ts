@@ -44,6 +44,7 @@ export interface TableProps<T extends Record<string, unknown>> {
   footer?: React.ReactNode;
   onChange?: (state: TableState<T>) => any;
   data?: Array<T>;
+  format?: (data: Record<string, unknown>) => T;
   initialState?: Record<string, any>;
   manualSortBy?: boolean;
   manualFilters?: boolean;
