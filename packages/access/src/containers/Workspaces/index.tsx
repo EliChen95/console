@@ -1,5 +1,5 @@
 import React, { useRef } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { Banner, Button, Dropdown, Field, Menu, MenuItem } from '@kubed/components';
 import { Enterprise, More, Trash, Pen } from '@kubed/icons';
 import {
@@ -12,24 +12,12 @@ import {
   getDisplayName,
 } from '@ks-console/shared';
 import { get } from 'lodash';
-import styled from 'styled-components';
 
+import { useAction } from './useAction';
 import { ClusterWrapper, ClusterStore } from '@ks-console/clusters';
 import { getListUrl, workspaceMapper } from '../../stores/workspace';
 
 const { fetchList } = ClusterStore;
-
-export const CreateButton = styled(Button)`
-  min-width: 96px;
-  margin-left: 12px;
-`;
-
-export const BatchActionButton = styled(Button)`
-  min-width: 96px;
-  & + button {
-    margin-left: 12px;
-  }
-`;
 
 export default function Workspaces(): JSX.Element {
   const url = getListUrl();
@@ -39,6 +27,58 @@ export default function Workspaces(): JSX.Element {
   });
   const isSystemWorkspaces = (row?: Record<string, any>) =>
     get(row, 'name') === globals.config.systemWorkspace;
+  const { renderBatchAction, renderItemAction, renderTableAction } = useAction({
+    authKey: 'workspaces',
+    itemAction: [
+      {
+        key: 'edit',
+        icon: <Pen />,
+        text: t('EDIT_INFORMATION'),
+        action: 'edit',
+        show: !isSystemWorkspaces,
+        onClick: (...args) => {
+          console.log(args);
+        },
+      },
+      {
+        key: 'delete',
+        icon: <Trash />,
+        text: t('DELETE'),
+        action: 'delete',
+        show: !isSystemWorkspaces,
+        onClick: (...args) => {
+          console.log(args);
+        },
+      },
+    ],
+    tableAction: [
+      {
+        key: 'create',
+        text: t('CREATE'),
+        action: 'create',
+        onClick: (...args) => {
+          console.log(args);
+        },
+        props: {
+          color: 'secondary',
+          shadow: true,
+        },
+      },
+    ],
+    batchAction: [
+      {
+        key: 'delete',
+        text: t('DELETE'),
+        action: 'delete',
+        onClick: (...args) => {
+          console.log(args);
+        },
+        props: {
+          color: 'error',
+        },
+      },
+    ],
+  });
 
   const columns: Column[] = [
     {
@@ -70,22 +110,7 @@ export default function Workspaces(): JSX.Element {
       id: 'option',
       title: '',
       width: 20,
-      render: (value, row) =>
-        !isSystemWorkspaces(row) ? (
-          <Dropdown
-            placement="bottom-end"
-            content={
-              <Menu>
-                <MenuItem icon={<Pen />}>{t('EDIT_INFORMATION')}</MenuItem>
-                <MenuItem icon={<Trash />}>{t('DELETE')}</MenuItem>
-              </Menu>
-            }
-          >
-            <Button variant="text" radius="lg">
-              <More size={16} />
-            </Button>
-          </Dropdown>
-        ) : null,
+      render: renderItemAction,
     },
   ];
   if (isMultiCluster()) {
@@ -115,13 +140,9 @@ export default function Workspaces(): JSX.Element {
         rowKey="name"
         url={url}
         format={workspaceMapper}
-        batchActions={<BatchActionButton color="error">{t('DELETE')}</BatchActionButton>}
+        batchActions={renderBatchAction()}
         useStorageState={false}
-        toolbarRight={
-          <CreateButton color="secondary" shadow>
-            {t('CREATE')}
-          </CreateButton>
-        }
+        toolbarRight={renderTableAction()}
         onSelect={onSelect}
         disableRowSelect={isSystemWorkspaces}
         ref={tableRef}
