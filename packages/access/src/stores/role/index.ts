@@ -43,12 +43,14 @@ function useRoles(options?: Omit<UseListOptions<OriginalRole>, 'url'>) {
     {
       url,
       params,
-      format: (item: OriginalRole) => formatRole(item, module),
     },
     options,
   );
+  const result = useList(opts);
+  const roles = result?.data ?? [];
+  const formattedRoles = roles.map(role => formatRole(role, module));
 
-  return useList(opts);
+  return { ...result, formattedRoles };
 }
 
 export { getResourceUrl, formatRole, useRoles };

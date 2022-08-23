@@ -1,12 +1,11 @@
 import React from 'react';
-import { Modal, FormItem, Input, Select } from '@kubed/components';
+import { Modal, FormItem, Input, Select, useForm } from '@kubed/components';
 import type { FormItemProps } from '@kubed/components';
 import { Human } from '@kubed/icons';
-// import { isSystemRole } from '@ks-console/shared';
+import { isSystemRole } from '@ks-console/shared';
 
 import { useRoles } from '../../../stores/role';
-import { StyledForm } from './styles';
-import { OptionsType } from 'rc-select/lib/interface';
+import { StyledForm, Option, OptionName, OptionDescription } from './styles';
 
 type Rules = FormItemProps['rules'];
 
@@ -26,15 +25,31 @@ export interface UserBaseModalProps {
 }
 
 export default function UserBaseModal({ title, formFields }: UserBaseModalProps) {
-  const result = useRoles({
+  const [form] = useForm();
+  const { formattedRoles } = useRoles({
     params: { limit: -1, sortBy: 'createTime' },
   });
-  console.log(result);
-  const roleOptions: OptionsType | undefined = [];
+  const roleOptions = formattedRoles
+    .filter(item => !isSystemRole(item.name))
+    .map(item => ({
+      label: (
+        <Option>
+          <OptionName>{item.name}</OptionName>
+          <OptionDescription>{item.description}</OptionDescription>
+        </Option>
+      ),
+      value: item.name,
+      item,
+    }));
 
   return (
-    <Modal visible titleIcon={<Human size={20} />} title={title} width={691}>
-      <StyledForm>
+    <Modal visible titleIcon={<Human size={20} />} title={title} width={691} onOk={form.submit}>
+      <StyledForm
+        form={form}
+        onFinish={(values: any) => {
+          console.log(values);
+        }}
+      >
         <FormItem
           name="metadata.name"
           label={t('USERNAME')}
@@ -62,7 +77,11 @@ export default function UserBaseModal({ title, formFields }: UserBaseModalProps)
           label={t('PLATFORM_ROLE')}
           help={t('PLATFORM_ROLE_DESC')}
         >
-          <Select options={roleOptions} />
+          <Select
+            name="metadata.annotations['iam.kubesphere.io/globalrole']"
+            options={roleOptions}
+            optionLabelProp="value"
+          />
         </FormItem>
       </StyledForm>
     </Modal>
