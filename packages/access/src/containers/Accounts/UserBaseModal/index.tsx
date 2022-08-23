@@ -1,8 +1,16 @@
-import React from 'react';
-import { Modal, FormItem, Input, Select, useForm } from '@kubed/components';
+import React, { useState } from 'react';
+import {
+  Modal,
+  FormItem,
+  Input,
+  Select,
+  InputPassword,
+  Dropdown,
+  useForm,
+} from '@kubed/components';
 import type { FormItemProps } from '@kubed/components';
 import { Human } from '@kubed/icons';
-import { isSystemRole } from '@ks-console/shared';
+import { isSystemRole, Pattern, PasswordTip } from '@ks-console/shared';
 
 import { useRoles } from '../../../stores/role';
 import { StyledForm, Option, OptionName, OptionDescription } from './styles';
@@ -26,6 +34,7 @@ export interface UserBaseModalProps {
 
 export default function UserBaseModal({ title, formFields }: UserBaseModalProps) {
   const [form] = useForm();
+  const [tipVisible, setTipVisible] = useState(false);
   const { formattedRoles } = useRoles({
     params: { limit: -1, sortBy: 'createTime' },
   });
@@ -81,6 +90,50 @@ export default function UserBaseModal({ title, formFields }: UserBaseModalProps)
             name="metadata.annotations['iam.kubesphere.io/globalrole']"
             options={roleOptions}
             optionLabelProp="value"
+          />
+        </FormItem>
+        <Dropdown
+          visible={tipVisible}
+          maxWidth={350}
+          className="password-tip-dropdown"
+          interactive={false}
+          content={<PasswordTip password={'123'} hasProgress />}
+        >
+          <div>
+            <FormItem
+              name="spec.password"
+              label={t('PASSWORD')}
+              help={t('PASSWORD_DESC')}
+              rules={[
+                { required: true, message: t('PASSWORD_EMPTY_DESC') },
+                {
+                  pattern: Pattern.PATTERN_PASSWORD,
+                  message: t('PASSWORD_INVALID_DESC'),
+                },
+              ]}
+            >
+              <InputPassword
+                name="spec.password"
+                autoComplete="off"
+                onFocus={() => {
+                  setTipVisible(true);
+                }}
+                onBlur={() => {
+                  setTipVisible(false);
+                }}
+              />
+            </FormItem>
+          </div>
+        </Dropdown>
+        <FormItem
+          name="metadata.annotations['kubesphere.io/description']"
+          label={t('DESCRIPTION')}
+          help={t('DESCRIPTION_DESC')}
+        >
+          <textarea
+            name="metadata.annotations['kubesphere.io/description']"
+            placeholder="user@example.com"
+            autoComplete="off"
           />
         </FormItem>
       </StyledForm>

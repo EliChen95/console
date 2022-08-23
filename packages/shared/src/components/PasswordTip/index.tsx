@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { isEmpty } from 'lodash';
 import { Success } from '@kubed/icons';
 import { Progress } from '@kubed/components';
-import { Pattern } from '@ks-console/shared';
+import { Pattern } from '../../constants';
 
 const getStrength = (value: string): number => {
   if (isEmpty(value)) {
