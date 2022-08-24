@@ -1264,6 +1264,33 @@
     "@types/yargs" "^15.0.0"
     chalk "^3.0.0"
 
+"@ks-console/server@4.0.0-alpha.4":
+  version "4.0.0-alpha.4"
+  resolved "https://registry.yarnpkg.com/@ks-console/server/-/server-4.0.0-alpha.4.tgz#98cf713589986e57408f1b7900b9c3e6f9183aa2"
+  integrity sha512-mx4GkK3+ZQN/F5a36amjJUhlT3tUilT2tGCiTveu+qmkt5/1k1YZfMBdgpLzL5ByNwVXyRg6iv9v8oeQhgarqg==
+  dependencies:
+    dayjs "^1.10.7"
+    dnscache "^1.0.2"
+    http-proxy "^1.18.1"
+    js-yaml "^3.13.1"
+    jwt-decode "^3.1.2"
+    koa "^2.13.1"
+    koa-bodyparser "^4.3.0"
+    koa-compress "^5.1.0"
+    koa-convert "^2.0.0"
+    koa-ejs "^4.3.0"
+    koa-locales "^1.12.0"
+    koa-logger "^3.2.0"
+    koa-mount "^4.0.0"
+    koa-router "^10.1.1"
+    koa-router-proxy "^0.0.3"
+    koa-static "^5.0.0"
+    lodash "^4.17.21"
+    node-cache "^5.1.2"
+    node-fetch "^2.6.1"
+    path-to-regexp "^2.2.1"
+    stream-array "^1.1.2"
+
 "@kubed/components@^0.0.42":
   version "0.0.42"
   resolved "https://registry.yarnpkg.com/@kubed/components/-/components-0.0.42.tgz#542f185771ec312d8d5d8de880136acc3b970505"
@@ -5975,6 +6002,11 @@ jsonfile@^6.0.1:
   dependencies:
     array-includes "^3.1.3"
     object.assign "^4.1.2"
+
+jwt-decode@^2.2.0:
+  version "2.2.0"
+  resolved "https://registry.yarnpkg.com/jwt-decode/-/jwt-decode-2.2.0.tgz#7d86bd56679f58ce6a84704a657dd392bba81a79"
+  integrity sha512-86GgN2vzfUu7m9Wcj63iUkuDzFNYFVmjeDm2GzWpUk+opB0pEpMsw6ePCMrhYkumz2C1ihqtZzOMAg7FiXcNoQ==
 
 jwt-decode@^3.1.2:
   version "3.1.2"

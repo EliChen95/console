@@ -137,12 +137,14 @@ export function useList<T>(options: UseListOptions<T>): UseListInstance<T> {
     }
   }
 
+  const { items, ...rest } = state;
+
   return {
     isLoading: isFetching,
     isFirst,
     isLast,
-    data: state.items,
-    ...state,
+    data: items,
+    ...rest,
     refresh,
     reFetch,
     prevPage,
