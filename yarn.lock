@@ -1264,10 +1264,37 @@
     "@types/yargs" "^15.0.0"
     chalk "^3.0.0"
 
-"@kubed/components@^0.0.42":
-  version "0.0.42"
-  resolved "https://registry.yarnpkg.com/@kubed/components/-/components-0.0.42.tgz#542f185771ec312d8d5d8de880136acc3b970505"
-  integrity sha512-67r/SJz8NJe5JYGSHqXH6agF69dICfDDRtDo9/0SmPXFtZO9r9HN3gJ6t3c4LEftbE/kQc7zysyOOxkHts/y4A==
+"@ks-console/server@4.0.0-alpha.4":
+  version "4.0.0-alpha.4"
+  resolved "https://registry.yarnpkg.com/@ks-console/server/-/server-4.0.0-alpha.4.tgz#98cf713589986e57408f1b7900b9c3e6f9183aa2"
+  integrity sha512-mx4GkK3+ZQN/F5a36amjJUhlT3tUilT2tGCiTveu+qmkt5/1k1YZfMBdgpLzL5ByNwVXyRg6iv9v8oeQhgarqg==
+  dependencies:
+    dayjs "^1.10.7"
+    dnscache "^1.0.2"
+    http-proxy "^1.18.1"
+    js-yaml "^3.13.1"
+    jwt-decode "^3.1.2"
+    koa "^2.13.1"
+    koa-bodyparser "^4.3.0"
+    koa-compress "^5.1.0"
+    koa-convert "^2.0.0"
+    koa-ejs "^4.3.0"
+    koa-locales "^1.12.0"
+    koa-logger "^3.2.0"
+    koa-mount "^4.0.0"
+    koa-router "^10.1.1"
+    koa-router-proxy "^0.0.3"
+    koa-static "^5.0.0"
+    lodash "^4.17.21"
+    node-cache "^5.1.2"
+    node-fetch "^2.6.1"
+    path-to-regexp "^2.2.1"
+    stream-array "^1.1.2"
+
+"@kubed/components@^0.0.43":
+  version "0.0.43"
+  resolved "https://registry.yarnpkg.com/@kubed/components/-/components-0.0.43.tgz#2902669638bf4b48f40ec215565f922c42cf42a1"
+  integrity sha512-rSoSFDvoifZ3FIwI4y9BWZpK2hbjbrmwCH8B+W3HXt8yKCy+4Y/1dsJBx8hMnwwKw6YHbq+GCLDCGPkenpCE2Q==
   dependencies:
     "@tippyjs/react" "^4.2.5"
     classnames "^2.3.1"
@@ -1276,7 +1303,7 @@
     rc-collapse "^3.2.0"
     rc-dialog "^8.6.0"
     rc-drawer "^4.4.3"
-    rc-field-form "^1.21.2"
+    rc-field-form "^1.27.1"
     rc-input-number "^7.3.0"
     rc-motion "^2.4.4"
     rc-picker "^2.5.19"
@@ -5591,7 +5618,7 @@ is-installed-globally@^0.4.0:
 
 is-interactive@^1.0.0:
   version "1.0.0"
-  resolved "https://registry.yarnpkg.com/is-interactive/-/is-interactive-1.0.0.tgz#cea6e6ae5c870a7b0a0004070b7b587e0252912e"
+  resolved "https://regist,ry.yarnpkg.com/is-interactive/-/is-interactive-1.0.0.tgz#cea6e6ae5c870a7b0a0004070b7b587e0252912e"
   integrity sha512-2HvIEKRoqS62guEC+qBjpvRubdX910WCMuJTZ+I9yvqKU2/12eSL549HMwtabb4oupdj2sMP50k+XJfB/8JE6w==
 
 is-ip@^3.1.0:
