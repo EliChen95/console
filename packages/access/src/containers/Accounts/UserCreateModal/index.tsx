@@ -3,6 +3,7 @@ import { Pattern, validator } from '@ks-console/shared';
 
 import UserBaseModal from '../UserBaseModal';
 import type { UserBaseModalProps } from '../UserBaseModal';
+import { useUserCreateMutation } from '../../../stores/user';
 
 export default function UserCreateModal() {
   const formFields: UserBaseModalProps['formFields'] = {
@@ -33,6 +34,14 @@ export default function UserCreateModal() {
       ],
     },
   };
+  const { mutate, isLoading } = useUserCreateMutation();
 
-  return <UserBaseModal title={t('CREATE_USER')} formFields={formFields} />;
+  return (
+    <UserBaseModal
+      title={t('CREATE_USER')}
+      formFields={formFields}
+      confirmLoading={isLoading}
+      onOk={mutate}
+    />
+  );
 }

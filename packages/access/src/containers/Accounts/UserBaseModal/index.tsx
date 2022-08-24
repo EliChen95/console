@@ -13,7 +13,7 @@ import { Human } from '@kubed/icons';
 import { isSystemRole, Pattern, PasswordTip } from '@ks-console/shared';
 
 import { useRoles } from '../../../stores/role';
-import { useUserCreateMutation } from '../../../stores/user';
+import type { UserCreateParams } from '../../../stores/user';
 import { StyledForm, Option, OptionName, OptionDescription } from './styles';
 
 type Rules = FormItemProps['rules'];
@@ -31,9 +31,16 @@ interface FormFields {
 export interface UserBaseModalProps {
   title: string;
   formFields: FormFields;
+  confirmLoading: boolean;
+  onOk: (formValues: UserCreateParams) => void;
 }
 
-export default function UserBaseModal({ title, formFields }: UserBaseModalProps) {
+export default function UserBaseModal({
+  title,
+  formFields,
+  confirmLoading,
+  onOk,
+}: UserBaseModalProps) {
   const [form] = useForm();
   const [tipVisible, setTipVisible] = useState(false);
   const { formattedRoles } = useRoles({
@@ -51,10 +58,16 @@ export default function UserBaseModal({ title, formFields }: UserBaseModalProps)
       value: item.name,
       item,
     }));
-  const { mutate } = useUserCreateMutation();
 
   return (
-    <Modal visible titleIcon={<Human size={20} />} title={title} width={691} onOk={form.submit}>
+    <Modal
+      visible
+      titleIcon={<Human size={20} />}
+      title={title}
+      width={691}
+      confirmLoading={confirmLoading}
+      onOk={form.submit}
+    >
       <StyledForm
         form={form}
         initialValues={{
@@ -62,9 +75,9 @@ export default function UserBaseModal({ title, formFields }: UserBaseModalProps)
             name: '123',
           },
         }}
-        onFinish={(values: any) => {
-          console.log(values);
-          mutate(values);
+        onFinish={(formValues: UserCreateParams) => {
+          console.log(formValues);
+          onOk(formValues);
         }}
       >
         <FormItem

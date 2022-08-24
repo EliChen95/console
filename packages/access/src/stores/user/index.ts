@@ -34,7 +34,25 @@ export function getResourceUrl(params?: GetPathParams) {
 
 export const getListUrl = getResourceUrl;
 
+export interface UserCreateParams {
+  apiVersion: 'iam.kubesphere.io/v1alpha2';
+  kind: 'User';
+  metadata: {
+    name: string;
+    annotations: {
+      'iam.kubesphere.io/globalrole'?: string;
+      'kubesphere.io/description'?: string;
+      'iam.kubesphere.io/uninitialized': 'true';
+      'kubesphere.io/creator': string;
+    };
+  };
+  spec: {
+    email: string;
+    password: string;
+  };
+}
+
 export function useUserCreateMutation() {
   const url = getListUrl();
-  return useMutation(data => request.post(url, data));
+  return useMutation<unknown, unknown, UserCreateParams>(data => request.post(url, data));
 }
