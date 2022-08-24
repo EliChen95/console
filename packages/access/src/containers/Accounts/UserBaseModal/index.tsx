@@ -13,6 +13,7 @@ import { Human } from '@kubed/icons';
 import { isSystemRole, Pattern, PasswordTip } from '@ks-console/shared';
 
 import { useRoles } from '../../../stores/role';
+import { useUserCreateMutation } from '../../../stores/user';
 import { StyledForm, Option, OptionName, OptionDescription } from './styles';
 
 type Rules = FormItemProps['rules'];
@@ -50,23 +51,29 @@ export default function UserBaseModal({ title, formFields }: UserBaseModalProps)
       value: item.name,
       item,
     }));
+  const { mutate } = useUserCreateMutation();
 
   return (
     <Modal visible titleIcon={<Human size={20} />} title={title} width={691} onOk={form.submit}>
       <StyledForm
         form={form}
+        initialValues={{
+          metadata: {
+            name: '123',
+          },
+        }}
         onFinish={(values: any) => {
           console.log(values);
+          mutate(values);
         }}
       >
         <FormItem
-          name="metadata.name"
+          name={['metadata', 'name']}
           label={t('USERNAME')}
           help={t('USERNAME_DESC')}
           rules={formFields['metadata.name'].rules}
         >
           <Input
-            name="metadata.name"
             autoComplete="off"
             autoFocus={true}
             maxLength={32}
@@ -74,23 +81,19 @@ export default function UserBaseModal({ title, formFields }: UserBaseModalProps)
           />
         </FormItem>
         <FormItem
-          name="spec.email"
+          name={['spec', 'email']}
           label={t('EMAIL')}
           help={t('EMAIL_DESC')}
           rules={formFields['spec.email'].rules}
         >
-          <Input name="spec.email" placeholder="user@example.com" autoComplete="off" />
+          <Input placeholder="user@example.com" autoComplete="off" />
         </FormItem>
         <FormItem
-          name="metadata.annotations['iam.kubesphere.io/globalrole']"
+          name={['metadata', 'annotations', 'iam.kubesphere.io/globalrole']}
           label={t('PLATFORM_ROLE')}
           help={t('PLATFORM_ROLE_DESC')}
         >
-          <Select
-            name="metadata.annotations['iam.kubesphere.io/globalrole']"
-            options={roleOptions}
-            optionLabelProp="value"
-          />
+          <Select options={roleOptions} optionLabelProp="value" />
         </FormItem>
         <Dropdown
           visible={tipVisible}
@@ -101,7 +104,7 @@ export default function UserBaseModal({ title, formFields }: UserBaseModalProps)
         >
           <div>
             <FormItem
-              name="spec.password"
+              name={['spec', 'password']}
               label={t('PASSWORD')}
               help={t('PASSWORD_DESC')}
               rules={[
@@ -113,7 +116,6 @@ export default function UserBaseModal({ title, formFields }: UserBaseModalProps)
               ]}
             >
               <InputPassword
-                name="spec.password"
                 autoComplete="off"
                 onFocus={() => {
                   setTipVisible(true);
@@ -126,15 +128,11 @@ export default function UserBaseModal({ title, formFields }: UserBaseModalProps)
           </div>
         </Dropdown>
         <FormItem
-          name="metadata.annotations['kubesphere.io/description']"
+          name={['metadata', 'annotations', 'kubesphere.io/description']}
           label={t('DESCRIPTION')}
           help={t('DESCRIPTION_DESC')}
         >
-          <textarea
-            name="metadata.annotations['kubesphere.io/description']"
-            placeholder="user@example.com"
-            autoComplete="off"
-          />
+          <textarea placeholder="user@example.com" autoComplete="off" />
         </FormItem>
       </StyledForm>
     </Modal>

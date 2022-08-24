@@ -1,4 +1,5 @@
-import { useUrl } from '@ks-console/shared';
+import { useMutation } from 'react-query';
+import { useUrl, request } from '@ks-console/shared';
 
 import type { GetPathParams } from '../../types';
 
@@ -29,4 +30,11 @@ function getModule(params?: GetPathParams) {
 
 export function getResourceUrl(params?: GetPathParams) {
   return `kapis/iam.kubesphere.io/v1alpha2${getPath(params)}/${getModule(params)}`;
+}
+
+export const getListUrl = getResourceUrl;
+
+export function useUserCreateMutation() {
+  const url = getListUrl();
+  return useMutation(data => request.post(url, data));
 }
