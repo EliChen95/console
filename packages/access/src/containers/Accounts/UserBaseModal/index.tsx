@@ -7,6 +7,7 @@ import {
   InputPassword,
   Dropdown,
   useForm,
+  useWatch,
 } from '@kubed/components';
 import type { FormItemProps } from '@kubed/components';
 import { Human } from '@kubed/icons';
@@ -42,6 +43,7 @@ export default function UserBaseModal({
   onOk,
 }: UserBaseModalProps) {
   const [form] = useForm();
+  const password = useWatch(['spec', 'password'], form) ?? '';
   const [tipVisible, setTipVisible] = useState(false);
   const { formattedRoles } = useRoles({
     params: { limit: -1, sortBy: 'createTime' },
@@ -113,7 +115,7 @@ export default function UserBaseModal({
           maxWidth={350}
           className="password-tip-dropdown"
           interactive={false}
-          content={<PasswordTip password={'123'} hasProgress />}
+          content={<PasswordTip password={password} hasProgress />}
         >
           <div>
             <FormItem
