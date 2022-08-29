@@ -55,7 +55,10 @@ export function formatUser(item: OriginalUser) {
   };
 }
 
-export function useUserCreateMutation() {
+export function useUserCreateMutation(options?: { onSuccess?: () => void }) {
   const url = getListUrl();
-  return useMutation<unknown, unknown, UserCreateParams>(data => request.post(url, data));
+  const onSuccess = options?.onSuccess;
+  return useMutation<unknown, unknown, UserCreateParams>(data => request.post(url, data), {
+    onSuccess,
+  });
 }

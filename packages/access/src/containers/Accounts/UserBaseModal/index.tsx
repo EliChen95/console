@@ -33,19 +33,23 @@ interface FormFieldProps {
 }
 
 export interface UserBaseModalProps {
+  visible: boolean;
   title: string;
   formFieldProps: FormFieldProps;
   initialFromValues?: Partial<UserFormValues>;
   confirmLoading: boolean;
   onOk: (formValues: UserFormValues) => void;
+  onCancel: () => void;
 }
 
 export default function UserBaseModal({
+  visible,
   title,
   formFieldProps,
   initialFromValues,
   confirmLoading,
   onOk,
+  onCancel,
 }: UserBaseModalProps) {
   const [form] = useForm<UserFormValues>();
   const password = useWatch(['spec', 'password'], form) ?? '';
@@ -68,12 +72,13 @@ export default function UserBaseModal({
 
   return (
     <Modal
-      visible
+      visible={visible}
       titleIcon={<Human size={20} />}
       title={title}
       width={691}
       confirmLoading={confirmLoading}
       onOk={form.submit}
+      onCancel={onCancel}
     >
       <StyledForm
         form={form}
@@ -108,7 +113,7 @@ export default function UserBaseModal({
         >
           <Select options={roleOptions} optionLabelProp="value" />
         </FormItem>
-        {!formFieldProps?.['spec.password']?.isExclude ?? (
+        {!formFieldProps?.['spec.password']?.isExclude && (
           <Dropdown
             visible={tipVisible}
             maxWidth={350}
@@ -150,7 +155,8 @@ export default function UserBaseModal({
           label={t('DESCRIPTION')}
           help={t('DESCRIPTION_DESC')}
         >
-          <textarea placeholder="user@example.com" autoComplete="off" />
+          {/*TODO: textarea*/}
+          <textarea maxLength={256} rows={3} />
         </FormItem>
       </StyledForm>
     </Modal>

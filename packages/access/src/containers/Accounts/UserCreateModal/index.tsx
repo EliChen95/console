@@ -1,5 +1,6 @@
 import React from 'react';
 import { merge } from 'lodash';
+import { notify } from '@kubed/components';
 import { Pattern, validator } from '@ks-console/shared';
 
 import type { UserFormValues } from '../../../types/user';
@@ -7,7 +8,12 @@ import type { UserBaseModalProps } from '../UserBaseModal';
 import UserBaseModal from '../UserBaseModal';
 import { useUserCreateMutation } from '../../../stores/user';
 
-export default function UserCreateModal() {
+interface UserCreateModalProps {
+  visible: boolean;
+  onCancel: () => void;
+}
+
+export default function UserCreateModal({ visible, onCancel }: UserCreateModalProps) {
   const formFields: UserBaseModalProps['formFieldProps'] = {
     'metadata.name': {
       rules: [
@@ -36,7 +42,12 @@ export default function UserCreateModal() {
       ],
     },
   };
-  const { mutate, isLoading } = useUserCreateMutation();
+  const { mutate, isLoading } = useUserCreateMutation({
+    onSuccess: () => {
+      onCancel();
+      notify.success(t('CREATE_SUCCESSFUL'));
+    },
+  });
 
   const handleSubmit = (formValues: UserFormValues) => {
     const baseValues = {
@@ -54,10 +65,12 @@ export default function UserCreateModal() {
 
   return (
     <UserBaseModal
+      visible={visible}
       title={t('CREATE_USER')}
       formFieldProps={formFields}
       confirmLoading={isLoading}
       onOk={handleSubmit}
+      onCancel={onCancel}
     />
   );
 }

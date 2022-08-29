@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { Banner, Field } from '@kubed/components';
 import { Human } from '@kubed/icons';
@@ -55,6 +55,8 @@ export default function Accounts() {
     <BatchActionButton key="disabled">{t('DISABLE')}</BatchActionButton>,
   ];
 
+  const [userCreateModalVisible, setUserCreateModalVisible] = useState(false);
+
   return (
     <>
       <Banner icon={<Human />} title={t('USER_PL')} description={t('USER_DESC')} className="mb12" />
@@ -69,12 +71,17 @@ export default function Accounts() {
           return globals.config.presetUsers.includes(name) || globals.user.username === name;
         }}
         toolbarRight={
-          <CreateButton color="secondary" shadow>
+          <CreateButton color="secondary" shadow onClick={() => setUserCreateModalVisible(true)}>
             {t('CREATE')}
           </CreateButton>
         }
       />
-      <UserCreateModal />
+      {userCreateModalVisible && (
+        <UserCreateModal
+          visible={userCreateModalVisible}
+          onCancel={() => setUserCreateModalVisible(false)}
+        />
+      )}
     </>
   );
 }
