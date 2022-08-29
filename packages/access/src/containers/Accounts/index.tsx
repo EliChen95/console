@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
+import { noop } from 'lodash';
 import { Banner, Field } from '@kubed/components';
 import { Human } from '@kubed/icons';
 import { DataTable, formatTime, StatusIndicator } from '@ks-console/shared';
@@ -56,11 +57,14 @@ export default function Accounts() {
   ];
 
   const [userCreateModalVisible, setUserCreateModalVisible] = useState(false);
+  const ref = useRef<{ refetch: () => void }>(null);
+  const refetchData = ref.current?.refetch ?? noop;
 
   return (
     <>
       <Banner icon={<Human />} title={t('USER_PL')} description={t('USER_DESC')} className="mb12" />
       <DataTable
+        ref={ref}
         columns={columns}
         tableName="users"
         rowKey="name"
@@ -79,6 +83,7 @@ export default function Accounts() {
       {userCreateModalVisible && (
         <UserCreateModal
           visible={userCreateModalVisible}
+          refetchData={refetchData}
           onCancel={() => setUserCreateModalVisible(false)}
         />
       )}

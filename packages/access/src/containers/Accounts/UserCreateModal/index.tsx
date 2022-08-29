@@ -10,10 +10,11 @@ import { useUserCreateMutation } from '../../../stores/user';
 
 interface UserCreateModalProps {
   visible: boolean;
+  refetchData: () => void;
   onCancel: () => void;
 }
 
-export default function UserCreateModal({ visible, onCancel }: UserCreateModalProps) {
+export default function UserCreateModal({ visible, refetchData, onCancel }: UserCreateModalProps) {
   const formFields: UserBaseModalProps['formFieldProps'] = {
     'metadata.name': {
       rules: [
@@ -44,6 +45,7 @@ export default function UserCreateModal({ visible, onCancel }: UserCreateModalPr
   };
   const { mutate, isLoading } = useUserCreateMutation({
     onSuccess: () => {
+      refetchData();
       onCancel();
       notify.success(t('CREATE_SUCCESSFUL'));
     },
