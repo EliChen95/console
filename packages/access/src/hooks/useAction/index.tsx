@@ -60,7 +60,7 @@ function renderByActionList<T extends Record<string, unknown>>(
   };
 }
 
-export function useAction<T extends Record<string, unknown>>({
+export function useAction<T extends Record<string, any>>({
   authKey,
   params = {},
   itemAction = [],

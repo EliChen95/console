@@ -66,6 +66,12 @@ export interface TableProps<T extends Record<string, unknown>> {
   toolbarRight?: React.ReactNode;
 }
 
+export interface TableRef<T> {
+  refetch: () => void;
+  getSelectedRowIds: () => Record<string, boolean>;
+  getSelectedFlatRows: () => T[];
+}
+
 export function prepareColumns<T extends Record<string, unknown>>(
   columns: Column[] = [],
 ): { formatColumns: TableColumn<T>[]; suggestions: Suggestions } {

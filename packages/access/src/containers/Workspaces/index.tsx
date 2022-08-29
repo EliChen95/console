@@ -1,32 +1,54 @@
-import React, { useRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
-import { Banner, Button, Dropdown, Field, Menu, MenuItem } from '@kubed/components';
-import { Enterprise, More, Trash, Pen } from '@kubed/icons';
+import { Banner, Field, Checkbox, notify } from '@kubed/components';
+import { Enterprise, Trash, Pen } from '@kubed/icons';
 import {
   DataTable,
   Column,
-  getServedVersion,
   formatTime,
-  useUrl,
   isMultiCluster,
   getDisplayName,
+  DeleteConfirmModal,
 } from '@ks-console/shared';
 import { get } from 'lodash';
 
-import { useAction } from './useAction';
+import { DescribleWrapper } from './styles';
+import { useAction } from '../../hooks/useAction';
 import { ClusterWrapper, ClusterStore } from '@ks-console/clusters';
-import { getListUrl, workspaceMapper } from '../../stores/workspace';
+import { name, getListUrl, workspaceMapper, deleteWorkspace } from '../../stores/workspace';
+import { MappedWorkspace } from '../../stores/workspace/types';
 
 const { fetchList } = ClusterStore;
 
 export default function Workspaces(): JSX.Element {
   const url = getListUrl();
-  const tableRef = useRef();
-  const { isLoading: isClusterLoading, data: clustersData = [] } = fetchList({
-    limit: -1,
-  });
+  const tableRef = useRef<any>();
+  const [workspaces, setWorkspaces] = useState<MappedWorkspace[]>([]);
+  const [shouldDeleteResource, setShouldDeleteResource] = useState<boolean>(false);
+  const [deleteVisible, setDeleteVisible] = useState<boolean>(false);
+  const { data: clustersData = [] } = fetchList({ limit: -1 });
   const isSystemWorkspaces = (row?: Record<string, any>) =>
     get(row, 'name') === globals.config.systemWorkspace;
+
+  const handleDelete = async () => {
+    const data = {
+      kind: 'DeleteOptions',
+      apiVersion: 'v1',
+      propagationPolicy: 'Orphan',
+    };
+    await Promise.all(
+      workspaces?.map(workspace =>
+        deleteWorkspace({
+          params: workspace,
+          data: !shouldDeleteResource ? data : {},
+        }),
+      ),
+    );
+    setDeleteVisible(false);
+    notify.success(t('DELETE_SUCCESSFUL'));
+    tableRef?.current?.refetch();
+  };
+
   const { renderBatchAction, renderItemAction, renderTableAction } = useAction({
     authKey: 'workspaces',
     itemAction: [
@@ -46,8 +68,9 @@ export default function Workspaces(): JSX.Element {
         text: t('DELETE'),
         action: 'delete',
         show: !isSystemWorkspaces,
-        onClick: (...args) => {
-          console.log(args);
+        onClick: (e, record) => {
+          setWorkspaces([record as MappedWorkspace]);
+          setDeleteVisible(true);
         },
       },
     ],
@@ -70,8 +93,10 @@ export default function Workspaces(): JSX.Element {
         key: 'delete',
         text: t('DELETE'),
         action: 'delete',
-        onClick: (...args) => {
-          console.log(args);
+        onClick: () => {
+          const selectedFlatRows = tableRef?.current?.getSelectedFlatRows() || [];
+          setWorkspaces(selectedFlatRows);
+          setDeleteVisible(true);
         },
         props: {
           color: 'error',
@@ -107,12 +132,13 @@ export default function Workspaces(): JSX.Element {
       render: time => formatTime(time),
     },
     {
-      id: 'option',
+      id: 'more',
       title: '',
       width: 20,
       render: renderItemAction,
     },
   ];
+
   if (isMultiCluster()) {
     columns.splice(1, 0, {
       title: t('CLUSTER_PL'),
@@ -121,10 +147,6 @@ export default function Workspaces(): JSX.Element {
       render: clusters => <ClusterWrapper clusters={clusters} clustersDetail={clustersData} />,
     });
   }
-
-  const onSelect = (selectedRowKey?: string[], selectedRows?: Record<string, unknown>[]) => {
-    console.log(selectedRowKey, selectedRows);
-  };
 
   return (
     <>
@@ -143,9 +165,24 @@ export default function Workspaces(): JSX.Element {
         batchActions={renderBatchAction()}
         useStorageState={false}
         toolbarRight={renderTableAction()}
-        onSelect={onSelect}
         disableRowSelect={isSystemWorkspaces}
         ref={tableRef}
+      />
+      <DeleteConfirmModal
+        visible={deleteVisible}
+        type={name}
+        resource={workspaces?.map(item => item.name)}
+        onOk={handleDelete}
+        onCancel={() => setDeleteVisible(false)}
+        desc={
+          <DescribleWrapper>
+            <Checkbox
+              onChange={e => setShouldDeleteResource(e.target.checked)}
+              checked={shouldDeleteResource}
+              label={t('DELETE_WORKSPACE_PROJECTS_DESC')}
+            />
+          </DescribleWrapper>
+        }
       />
     </>
   );

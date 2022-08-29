@@ -189,7 +189,7 @@ function DataTableComponent<T extends Record<string, unknown>>(
     rows,
     prepareRow,
     state,
-    // selectedFlatRows,
+    selectedFlatRows,
   } = instance;
   const [debouncedState] = useDebouncedValue(state, 500);
 
@@ -225,6 +225,8 @@ function DataTableComponent<T extends Record<string, unknown>>(
     refetch: () => {
       refetch();
     },
+    getSelectedRowIds: () => debouncedState.selectedRowIds,
+    getSelectedFlatRows: () => selectedFlatRows.map(d => d.original),
   }));
 
   return (
