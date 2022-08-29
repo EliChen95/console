@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { noop } from 'lodash';
 import { Banner, Field } from '@kubed/components';
-import { Human } from '@kubed/icons';
+import { Human /*Pen, Stop, Star, Trash*/ } from '@kubed/icons';
 import { DataTable, formatTime, StatusIndicator } from '@ks-console/shared';
 import type { Column } from '@ks-console/shared';
 
@@ -63,12 +63,15 @@ export default function Accounts() {
   return (
     <>
       <Banner icon={<Human />} title={t('USER_PL')} description={t('USER_DESC')} className="mb12" />
+      {/* TODO: no search */}
       <DataTable
         ref={ref}
         columns={columns}
         tableName="users"
         rowKey="name"
         url={url}
+        placeholder={t('SEARCH_BY_NAME')}
+        simpleSearch
         batchActions={batchActions}
         disableRowSelect={row => {
           const name = row?.metadata?.name;
