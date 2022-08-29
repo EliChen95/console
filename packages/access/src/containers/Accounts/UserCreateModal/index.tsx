@@ -1,12 +1,14 @@
 import React from 'react';
+import { merge } from 'lodash';
 import { Pattern, validator } from '@ks-console/shared';
 
-import UserBaseModal from '../UserBaseModal';
+import type { UserFormValues } from '../../../types/user';
 import type { UserBaseModalProps } from '../UserBaseModal';
+import UserBaseModal from '../UserBaseModal';
 import { useUserCreateMutation } from '../../../stores/user';
 
 export default function UserCreateModal() {
-  const formFields: UserBaseModalProps['formFields'] = {
+  const formFields: UserBaseModalProps['formFieldProps'] = {
     'metadata.name': {
       rules: [
         { required: true, message: t('USERNAME_EMPTY_DESC') },
@@ -36,12 +38,26 @@ export default function UserCreateModal() {
   };
   const { mutate, isLoading } = useUserCreateMutation();
 
+  const handleSubmit = (formValues: UserFormValues) => {
+    const baseValues = {
+      apiVersion: 'iam.kubesphere.io/v1alpha2',
+      kind: 'User',
+      metadata: {
+        annotations: {
+          'iam.kubesphere.io/uninitialized': 'true',
+        },
+      },
+    } as const;
+    const params = merge({}, baseValues, formValues);
+    mutate(params);
+  };
+
   return (
     <UserBaseModal
       title={t('CREATE_USER')}
-      formFields={formFields}
+      formFieldProps={formFields}
       confirmLoading={isLoading}
-      onOk={mutate}
+      onOk={handleSubmit}
     />
   );
 }

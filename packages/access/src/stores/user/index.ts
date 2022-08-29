@@ -1,7 +1,10 @@
+import { get } from 'lodash';
 import { useMutation } from 'react-query';
-import { useUrl, request } from '@ks-console/shared';
+import { useUrl, getBaseInfo, getOriginData, request } from '@ks-console/shared';
 
 import type { GetPathParams } from '../../types';
+import type { UserCreateParams } from '../../types/user';
+import type { OriginalUser } from './types';
 
 const module = 'users';
 
@@ -34,21 +37,21 @@ export function getResourceUrl(params?: GetPathParams) {
 
 export const getListUrl = getResourceUrl;
 
-export interface UserCreateParams {
-  apiVersion: 'iam.kubesphere.io/v1alpha2';
-  kind: 'User';
-  metadata: {
-    name: string;
-    annotations: {
-      'iam.kubesphere.io/globalrole'?: string;
-      'kubesphere.io/description'?: string;
-      'iam.kubesphere.io/uninitialized': 'true';
-      'kubesphere.io/creator': string;
-    };
-  };
-  spec: {
-    email: string;
-    password: string;
+export function formatUser(item: OriginalUser) {
+  return {
+    ...getBaseInfo(item),
+    username: get(item, 'metadata.name', ''),
+    email: get(item, 'spec.email', ''),
+    role: get(item, 'metadata.annotations["iam.kubesphere.io/role"]', ''),
+    globalrole: get(item, 'metadata.annotations["iam.kubesphere.io/globalrole"]', ''),
+    clusterrole: get(item, 'metadata.annotations["iam.kubesphere.io/clusterrole"]', ''),
+    workspacerole: get(item, 'metadata.annotations["iam.kubesphere.io/workspacerole"]', ''),
+    roleBind: get(item, 'metadata.annotations["iam.kubesphere.io/role-binding"]', ''),
+    groups: get(item, 'spec.groups', []),
+    status: get(item, 'status.state', 'Pending'),
+    conditions: get(item, 'status.conditions', []),
+    lastLoginTime: get(item, 'status.lastLoginTime'),
+    _originData: getOriginData(item),
   };
 }
 
