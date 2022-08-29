@@ -3,8 +3,7 @@ import { useMutation } from 'react-query';
 import { useUrl, getBaseInfo, getOriginData, request } from '@ks-console/shared';
 
 import type { GetPathParams } from '../../types';
-import type { UserCreateParams } from '../../types/user';
-import type { OriginalUser } from './types';
+import type { UserCreateParams, OriginalUser } from '../../types/user';
 
 const module = 'users';
 
@@ -54,6 +53,8 @@ export function formatUser(item: OriginalUser) {
     _originData: getOriginData(item),
   };
 }
+
+export type FormattedUser = ReturnType<typeof formatUser>;
 
 export function useUserCreateMutation(options?: { onSuccess?: () => void }) {
   const url = getListUrl();

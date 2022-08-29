@@ -6,11 +6,20 @@ import { Human /*Pen, Stop, Star, Trash*/ } from '@kubed/icons';
 import { DataTable, formatTime, StatusIndicator } from '@ks-console/shared';
 import type { Column } from '@ks-console/shared';
 
-import { getResourceUrl } from '../../stores/user';
+import type { OriginalUser } from '../../types/user';
+import type { FormattedUser } from '../../stores/user';
+import { getResourceUrl, formatUser } from '../../stores/user';
 import UserCreateModal from './UserCreateModal';
+import UserModifyModal from './UserModifyModal';
 import { Avatar, CreateButton, BatchActionButton } from './styles';
 
 export default function Accounts() {
+  const [userCreateModalVisible, setUserCreateModalVisible] = useState(false);
+  const [userModifyModalVisible, setUserModifyModalVisible] = useState(false);
+  const [detail, setDetail] = useState<FormattedUser>();
+  const ref = useRef<{ refetch: () => void }>(null);
+  const refetchData = ref.current?.refetch ?? noop;
+
   const columns: Column[] = [
     {
       title: t('NAME'),
@@ -45,6 +54,24 @@ export default function Accounts() {
       width: '20%',
       render: value => (value ? formatTime(value) : t('NOT_LOGIN_YET')),
     },
+    {
+      title: ' ',
+      // TODO: temp
+      render: (value, row) => {
+        const formattedUser = formatUser(row as OriginalUser);
+
+        return (
+          <CreateButton
+            onClick={() => {
+              setDetail(formattedUser);
+              setUserModifyModalVisible(true);
+            }}
+          >
+            modify
+          </CreateButton>
+        );
+      },
+    },
   ];
   // TODO: missing params ?
   const url = getResourceUrl();
@@ -55,10 +82,6 @@ export default function Accounts() {
     <BatchActionButton key="active">{t('ENABLE')}</BatchActionButton>,
     <BatchActionButton key="disabled">{t('DISABLE')}</BatchActionButton>,
   ];
-
-  const [userCreateModalVisible, setUserCreateModalVisible] = useState(false);
-  const ref = useRef<{ refetch: () => void }>(null);
-  const refetchData = ref.current?.refetch ?? noop;
 
   return (
     <>
@@ -78,9 +101,11 @@ export default function Accounts() {
           return globals.config.presetUsers.includes(name) || globals.user.username === name;
         }}
         toolbarRight={
-          <CreateButton color="secondary" shadow onClick={() => setUserCreateModalVisible(true)}>
-            {t('CREATE')}
-          </CreateButton>
+          <>
+            <CreateButton color="secondary" shadow onClick={() => setUserCreateModalVisible(true)}>
+              {t('CREATE')}
+            </CreateButton>
+          </>
         }
       />
       {userCreateModalVisible && (
@@ -88,6 +113,14 @@ export default function Accounts() {
           visible={userCreateModalVisible}
           refetchData={refetchData}
           onCancel={() => setUserCreateModalVisible(false)}
+        />
+      )}
+      {userModifyModalVisible && (
+        <UserModifyModal
+          visible={userModifyModalVisible}
+          refetchData={refetchData}
+          detail={detail}
+          onCancel={() => setUserModifyModalVisible(false)}
         />
       )}
     </>

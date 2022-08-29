@@ -3,7 +3,7 @@ import { useUrl, useList, getOriginData, getRoleBaseInfo, parser } from '@ks-con
 import type { UseListOptions } from '@ks-console/shared';
 
 import type { GetPathParams } from '../../types';
-import type { OriginalRole, FormatRoleKind } from './types';
+import type { OriginalRole, FormatRoleKind } from '../../types/role';
 
 const module = 'globalroles';
 

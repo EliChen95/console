@@ -28,7 +28,7 @@ interface FormFieldProps {
     rules: Rules;
   };
   'spec.password'?: {
-    isExclude?: false;
+    isExclude?: boolean;
   };
 }
 
@@ -36,8 +36,8 @@ export interface UserBaseModalProps {
   visible: boolean;
   title: string;
   formFieldProps: FormFieldProps;
-  initialFromValues?: Partial<UserFormValues>;
   confirmLoading: boolean;
+  detail?: Record<string, any>;
   onOk: (formValues: UserFormValues) => void;
   onCancel: () => void;
 }
@@ -46,11 +46,12 @@ export default function UserBaseModal({
   visible,
   title,
   formFieldProps,
-  initialFromValues,
   confirmLoading,
+  detail,
   onOk,
   onCancel,
 }: UserBaseModalProps) {
+  const initialValues = detail?._originData ?? {};
   const [form] = useForm<UserFormValues>();
   const password = useWatch(['spec', 'password'], form) ?? '';
   const [tipVisible, setTipVisible] = useState(false);
@@ -82,7 +83,7 @@ export default function UserBaseModal({
     >
       <StyledForm
         form={form}
-        initialValues={initialFromValues}
+        initialValues={initialValues}
         onFinish={(formValues: UserFormValues) => onOk(formValues)}
       >
         <FormItem
