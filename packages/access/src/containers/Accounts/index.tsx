@@ -86,7 +86,7 @@ export default function Accounts() {
   return (
     <>
       <Banner icon={<Human />} title={t('USER_PL')} description={t('USER_DESC')} className="mb12" />
-      {/* TODO: no search */}
+      {/* TODO: missing search */}
       <DataTable
         ref={ref}
         columns={columns}
