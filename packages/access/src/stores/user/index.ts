@@ -1,5 +1,6 @@
 import { get, noop, merge } from 'lodash';
 import { useMutation } from 'react-query';
+import { notify } from '@kubed/components';
 import { useUrl, getBaseInfo, getOriginData, request, cookie } from '@ks-console/shared';
 
 import type { GetPathParams } from '../../types';
@@ -112,6 +113,27 @@ export function useUserStatusMutation(options?: { onSuccess?: () => void }) {
         },
       );
       return request.put(url, params);
+    },
+    { onSuccess },
+  );
+}
+
+export function validateUserDelete(detail: FormattedUser) {
+  if (detail.name === globals.user.username) {
+    notify.error(t('Error Tips'), t('Unable to delete itself'));
+    return false;
+  }
+
+  return true;
+}
+
+export function useUserDeleteMutation(options?: { onSuccess?: () => void }) {
+  const onSuccess = options?.onSuccess;
+
+  return useMutation(
+    (detail: FormattedUser) => {
+      const url = getDetailUrl(detail);
+      return request.delete(url);
     },
     { onSuccess },
   );

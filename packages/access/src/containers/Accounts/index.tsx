@@ -3,20 +3,28 @@ import { Link } from 'react-router-dom';
 import { noop } from 'lodash';
 import { Banner, Field, notify } from '@kubed/components';
 import { Human /*Pen, Stop, Star, Trash*/ } from '@kubed/icons';
-import { DataTable, formatTime, StatusIndicator } from '@ks-console/shared';
-import type { Column } from '@ks-console/shared';
+import { DataTable, formatTime, StatusIndicator, DeleteConfirmModal } from '@ks-console/shared';
+import type { Column, DeleteConfirmModalProps } from '@ks-console/shared';
 
 import type { OriginalUser } from '../../types/user';
 import type { FormattedUser } from '../../stores/user';
-import { getResourceUrl, formatUser, useUserStatusMutation } from '../../stores/user';
+import {
+  getResourceUrl,
+  formatUser,
+  useUserStatusMutation,
+  useUserDeleteMutation,
+  validateUserDelete,
+} from '../../stores/user';
 import UserCreateModal from './UserCreateModal';
-import UserModifyModal from './UserEditModal';
+import UserEditModal from './UserEditModal';
 import { Avatar, CreateButton, BatchActionButton } from './styles';
 
 export default function Accounts() {
   const [userCreateModalVisible, setUserCreateModalVisible] = useState(false);
-  const [userModifyModalVisible, setUserModifyModalVisible] = useState(false);
+  const [userEditModalVisible, setUserEditModalVisible] = useState(false);
+  const [userDeleteModalVisible, setUserDeleteModalVisible] = useState(false);
   const [detail, setDetail] = useState<FormattedUser>();
+  const [resource, setResource] = useState<DeleteConfirmModalProps['resource']>();
   const ref = useRef<{ refetch: () => void }>(null);
   const refetchData = ref.current?.refetch ?? noop;
 
@@ -24,6 +32,14 @@ export default function Accounts() {
     onSuccess: () => {
       refetchData();
       notify.success(t('UPDATE_SUCCESSFUL'));
+    },
+  });
+
+  const { mutate: mutateUserDelete, isLoading: isUserDeleteLoading } = useUserDeleteMutation({
+    onSuccess: () => {
+      refetchData();
+      notify.success(t('DELETE_SUCCESSFUL'));
+      setUserDeleteModalVisible(false);
     },
   });
 
@@ -72,13 +88,22 @@ export default function Accounts() {
             <CreateButton
               onClick={() => {
                 setDetail(formattedUser);
-                setUserModifyModalVisible(true);
+                setUserEditModalVisible(true);
               }}
             >
               {t('EDIT')}
             </CreateButton>
             <CreateButton onClick={() => mutateUserStatus(formattedUser)}>
               {formattedUser.status === 'Active' ? t('DISABLE') : t('ENABLE')}
+            </CreateButton>
+            <CreateButton
+              onClick={() => {
+                setDetail(formattedUser);
+                setResource(formattedUser.username);
+                setUserDeleteModalVisible(true);
+              }}
+            >
+              {t('DELETE')}
             </CreateButton>
           </>
         );
@@ -94,6 +119,17 @@ export default function Accounts() {
     <BatchActionButton key="active">{t('ENABLE')}</BatchActionButton>,
     <BatchActionButton key="disabled">{t('DISABLE')}</BatchActionButton>,
   ];
+
+  const handleUserDelete = () => {
+    if (!detail) {
+      return;
+    }
+
+    const result = validateUserDelete(detail);
+    if (result) {
+      mutateUserDelete(detail);
+    }
+  };
 
   return (
     <>
@@ -127,12 +163,22 @@ export default function Accounts() {
           onCancel={() => setUserCreateModalVisible(false)}
         />
       )}
-      {userModifyModalVisible && detail && (
-        <UserModifyModal
-          visible={userModifyModalVisible}
+      {userEditModalVisible && detail && (
+        <UserEditModal
+          visible={userEditModalVisible}
           refetchData={refetchData}
           detail={detail}
-          onCancel={() => setUserModifyModalVisible(false)}
+          onCancel={() => setUserEditModalVisible(false)}
+        />
+      )}
+      {userDeleteModalVisible && detail && (
+        <DeleteConfirmModal
+          visible={userDeleteModalVisible}
+          type="USER"
+          resource={resource}
+          confirmLoading={isUserDeleteLoading}
+          onOk={handleUserDelete}
+          onCancel={() => setUserDeleteModalVisible(false)}
         />
       )}
     </>
