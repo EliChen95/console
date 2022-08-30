@@ -44,6 +44,7 @@ export interface TableProps<T extends Record<string, unknown>> {
   footer?: React.ReactNode;
   onChange?: (state: TableState<T>) => any;
   data?: Array<T>;
+  format?: (data: Record<string, unknown>) => T;
   initialState?: Record<string, any>;
   manualSortBy?: boolean;
   manualFilters?: boolean;
@@ -63,6 +64,12 @@ export interface TableProps<T extends Record<string, unknown>> {
   useStorageState?: boolean;
   toolbarLeft?: React.ReactNode;
   toolbarRight?: React.ReactNode;
+}
+
+export interface TableRef<T> {
+  refetch: () => void;
+  getSelectedRowIds: () => Record<string, boolean>;
+  getSelectedFlatRows: () => T[];
 }
 
 export function prepareColumns<T extends Record<string, unknown>>(

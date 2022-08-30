@@ -124,6 +124,7 @@ function DataTableComponent<T extends Record<string, unknown>>(
     emptyPlaceholder,
     tableName,
     useStorageState,
+    format,
     disableRowSelect,
   } = props;
   const [, setStorageState] = useLocalStorage({ key: `tableState:${tableName}` });
@@ -159,7 +160,10 @@ function DataTableComponent<T extends Record<string, unknown>>(
     return get(row, rowKey) || String(relativeIndex);
   };
 
-  const memoData = useMemo(() => serverData?.items || [], [serverData]);
+  const memoData = useMemo(
+    () => (format && serverData ? serverData?.items?.map(format) : serverData?.items || []),
+    [serverData, format],
+  );
   const tableHooks = selectType ? withSelectionHooks : hooks;
 
   const instance = useTable(
@@ -185,7 +189,7 @@ function DataTableComponent<T extends Record<string, unknown>>(
     rows,
     prepareRow,
     state,
-    // selectedFlatRows,
+    selectedFlatRows,
   } = instance;
   const [debouncedState] = useDebouncedValue(state, 500);
 
@@ -221,6 +225,8 @@ function DataTableComponent<T extends Record<string, unknown>>(
     refetch: () => {
       refetch();
     },
+    getSelectedRowIds: () => debouncedState?.selectedRowIds || {},
+    getSelectedFlatRows: () => selectedFlatRows?.map(d => d.original) || [],
   }));
 
   return (
