@@ -10,7 +10,7 @@ import type { OriginalUser } from '../../types/user';
 import type { FormattedUser } from '../../stores/user';
 import { getResourceUrl, formatUser } from '../../stores/user';
 import UserCreateModal from './UserCreateModal';
-import UserModifyModal from './UserModifyModal';
+import UserModifyModal from './UserEditModal';
 import { Avatar, CreateButton, BatchActionButton } from './styles';
 
 export default function Accounts() {
@@ -115,7 +115,7 @@ export default function Accounts() {
           onCancel={() => setUserCreateModalVisible(false)}
         />
       )}
-      {userModifyModalVisible && (
+      {userModifyModalVisible && detail && (
         <UserModifyModal
           visible={userModifyModalVisible}
           refetchData={refetchData}

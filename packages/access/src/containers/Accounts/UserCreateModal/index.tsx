@@ -3,7 +3,7 @@ import { merge } from 'lodash';
 import { notify } from '@kubed/components';
 import { Pattern, validator } from '@ks-console/shared';
 
-import type { UserFormValues } from '../../../types/user';
+import type { UserActionValues } from '../../../types/user';
 import type { UserBaseModalProps } from '../UserBaseModal';
 import UserBaseModal from '../UserBaseModal';
 import { useUserCreateMutation } from '../../../stores/user';
@@ -51,17 +51,17 @@ export default function UserCreateModal({ visible, refetchData, onCancel }: User
     },
   });
 
-  const handleSubmit = (formValues: UserFormValues) => {
-    const baseValues = {
-      apiVersion: 'iam.kubesphere.io/v1alpha2',
-      kind: 'User',
-      metadata: {
-        annotations: {
-          'iam.kubesphere.io/uninitialized': 'true',
+  const handleSubmit = (formValues: UserActionValues) => {
+    const params = merge(
+      {
+        metadata: {
+          annotations: {
+            'iam.kubesphere.io/uninitialized': 'true',
+          },
         },
-      },
-    } as const;
-    const params = merge({}, baseValues, formValues);
+      } as const,
+      formValues,
+    );
     mutate(params);
   };
 

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { merge } from 'lodash';
 import {
   Modal,
   FormItem,
@@ -13,7 +14,7 @@ import type { FormItemProps } from '@kubed/components';
 import { Human } from '@kubed/icons';
 import { isSystemRole, Pattern, PasswordTip } from '@ks-console/shared';
 
-import type { UserFormValues } from '../../../types/user';
+import type { UserFormValues, UserActionValues } from '../../../types/user';
 import { useRoles } from '../../../stores/role';
 import { StyledForm, Option, OptionName, OptionDescription } from './styles';
 
@@ -38,7 +39,7 @@ export interface UserBaseModalProps {
   formFieldProps: FormFieldProps;
   confirmLoading: boolean;
   detail?: Record<string, any>;
-  onOk: (formValues: UserFormValues) => void;
+  onOk: (formValues: UserActionValues) => void;
   onCancel: () => void;
 }
 
@@ -84,7 +85,16 @@ export default function UserBaseModal({
       <StyledForm
         form={form}
         initialValues={initialValues}
-        onFinish={(formValues: UserFormValues) => onOk(formValues)}
+        onFinish={(formValues: UserFormValues) => {
+          const params = merge(
+            {
+              apiVersion: 'iam.kubesphere.io/v1alpha2',
+              kind: 'User',
+            } as const,
+            formValues,
+          );
+          onOk(params);
+        }}
       >
         <FormItem
           name={['metadata', 'name']}

@@ -56,15 +56,31 @@ interface UserFormValues {
   };
 }
 
-type UserCreateParams = UserFormValues & {
+interface UserActionValues extends UserFormValues {
   apiVersion: 'iam.kubesphere.io/v1alpha2';
   kind: 'User';
+}
+
+type UserCreateParams = UserActionValues & {
   metadata: {
     annotations: {
       'iam.kubesphere.io/uninitialized': 'true';
-      // 'kubesphere.io/creator': string;
     };
   };
 };
 
-export type { OriginalUser, UserFormValues, UserCreateParams };
+type UserEditParams = UserActionValues & {
+  metadata: {
+    resourceVersion: string;
+  };
+  spec: {
+    email: string;
+    password?: string;
+    lang?: string;
+  };
+  password?: string;
+  lang?: string;
+  [key: string]: any;
+};
+
+export type { OriginalUser, UserFormValues, UserActionValues, UserCreateParams, UserEditParams };

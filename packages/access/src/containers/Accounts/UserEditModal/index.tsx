@@ -2,20 +2,20 @@ import React from 'react';
 import { merge } from 'lodash';
 import { notify } from '@kubed/components';
 
-import type { UserFormValues } from '../../../types/user';
+import type { UserActionValues } from '../../../types/user';
 import type { UserBaseModalProps } from '../UserBaseModal';
 import UserBaseModal from '../UserBaseModal';
 import type { FormattedUser } from '../../../stores/user';
-import { useUserCreateMutation } from '../../../stores/user';
+import { useUserEditMutation } from '../../../stores/user';
 
 interface UserCreateModalProps {
   visible: boolean;
-  detail: FormattedUser | undefined;
+  detail: FormattedUser;
   refetchData: () => void;
   onCancel: () => void;
 }
 
-export default function UserModifyModal({
+export default function UserEditModal({
   visible,
   detail,
   refetchData,
@@ -38,25 +38,26 @@ export default function UserModifyModal({
       isExclude: true,
     },
   };
-  const { mutate, isLoading } = useUserCreateMutation({
+  const { mutate, isLoading } = useUserEditMutation({
+    detail,
     onSuccess: () => {
       refetchData();
       onCancel();
-      notify.success(t('CREATE_SUCCESSFUL'));
+      notify.success(t('UPDATE_SUCCESSFUL'));
     },
   });
 
-  const handleSubmit = (formValues: UserFormValues) => {
-    const baseValues = {
-      apiVersion: 'iam.kubesphere.io/v1alpha2',
-      kind: 'User',
-      metadata: {
-        annotations: {
-          'iam.kubesphere.io/uninitialized': 'true',
+  const handleSubmit = (formValues: UserActionValues) => {
+    const params = merge(
+      {},
+      detail._originData,
+      {
+        metadata: {
+          resourceVersion: detail.resourceVersion,
         },
       },
-    } as const;
-    const params = merge({}, baseValues, formValues);
+      formValues,
+    );
     mutate(params);
   };
 

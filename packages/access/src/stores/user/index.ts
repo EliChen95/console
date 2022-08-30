@@ -1,13 +1,13 @@
-import { get } from 'lodash';
+import { get, noop } from 'lodash';
 import { useMutation } from 'react-query';
-import { useUrl, getBaseInfo, getOriginData, request } from '@ks-console/shared';
+import { useUrl, getBaseInfo, getOriginData, request, cookie } from '@ks-console/shared';
 
 import type { GetPathParams } from '../../types';
-import type { UserCreateParams, OriginalUser } from '../../types/user';
+import type { OriginalUser, UserCreateParams, UserEditParams } from '../../types/user';
 
 const module = 'users';
 
-const { getPath } = useUrl({ module });
+const { getPath, getDetailUrl } = useUrl({ module });
 
 function getModule(params?: GetPathParams) {
   const cluster = params?.cluster;
@@ -61,5 +61,31 @@ export function useUserCreateMutation(options?: { onSuccess?: () => void }) {
   const onSuccess = options?.onSuccess;
   return useMutation<unknown, unknown, UserCreateParams>(data => request.post(url, data), {
     onSuccess,
+  });
+}
+
+export function useUserEditMutation({
+  detail,
+  onSuccess = noop,
+}: {
+  detail: FormattedUser;
+  onSuccess?: () => void;
+}) {
+  const url = getDetailUrl(detail);
+  return useMutation<unknown, unknown, UserEditParams>(data => request.put(url, data), {
+    onSuccess: async (data, params) => {
+      const { name } = detail;
+
+      if (params.password && name === globals.user.username) {
+        await request.post('logout');
+      } else {
+        const lang = params?.spec?.lang;
+        if (lang && params.lang !== cookie('lang')) {
+          window.location.reload();
+        }
+      }
+
+      onSuccess();
+    },
   });
 }
