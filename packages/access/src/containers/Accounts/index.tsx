@@ -1,14 +1,14 @@
 import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { noop } from 'lodash';
-import { Banner, Field } from '@kubed/components';
+import { Banner, Field, notify } from '@kubed/components';
 import { Human /*Pen, Stop, Star, Trash*/ } from '@kubed/icons';
 import { DataTable, formatTime, StatusIndicator } from '@ks-console/shared';
 import type { Column } from '@ks-console/shared';
 
 import type { OriginalUser } from '../../types/user';
 import type { FormattedUser } from '../../stores/user';
-import { getResourceUrl, formatUser } from '../../stores/user';
+import { getResourceUrl, formatUser, useUserStatusMutation } from '../../stores/user';
 import UserCreateModal from './UserCreateModal';
 import UserModifyModal from './UserEditModal';
 import { Avatar, CreateButton, BatchActionButton } from './styles';
@@ -19,6 +19,13 @@ export default function Accounts() {
   const [detail, setDetail] = useState<FormattedUser>();
   const ref = useRef<{ refetch: () => void }>(null);
   const refetchData = ref.current?.refetch ?? noop;
+
+  const { mutate: mutateUserStatus } = useUserStatusMutation({
+    onSuccess: () => {
+      refetchData();
+      notify.success(t('UPDATE_SUCCESSFUL'));
+    },
+  });
 
   const columns: Column[] = [
     {
@@ -61,14 +68,19 @@ export default function Accounts() {
         const formattedUser = formatUser(row as OriginalUser);
 
         return (
-          <CreateButton
-            onClick={() => {
-              setDetail(formattedUser);
-              setUserModifyModalVisible(true);
-            }}
-          >
-            modify
-          </CreateButton>
+          <>
+            <CreateButton
+              onClick={() => {
+                setDetail(formattedUser);
+                setUserModifyModalVisible(true);
+              }}
+            >
+              {t('EDIT')}
+            </CreateButton>
+            <CreateButton onClick={() => mutateUserStatus(formattedUser)}>
+              {formattedUser.status === 'Active' ? t('DISABLE') : t('ENABLE')}
+            </CreateButton>
+          </>
         );
       },
     },

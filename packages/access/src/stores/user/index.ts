@@ -1,4 +1,4 @@
-import { get, noop } from 'lodash';
+import { get, noop, merge } from 'lodash';
 import { useMutation } from 'react-query';
 import { useUrl, getBaseInfo, getOriginData, request, cookie } from '@ks-console/shared';
 
@@ -57,8 +57,8 @@ export function formatUser(item: OriginalUser) {
 export type FormattedUser = ReturnType<typeof formatUser>;
 
 export function useUserCreateMutation(options?: { onSuccess?: () => void }) {
-  const url = getListUrl();
   const onSuccess = options?.onSuccess;
+  const url = getListUrl();
   return useMutation<unknown, unknown, UserCreateParams>(data => request.post(url, data), {
     onSuccess,
   });
@@ -88,4 +88,31 @@ export function useUserEditMutation({
       onSuccess();
     },
   });
+}
+
+export function useUserStatusMutation(options?: { onSuccess?: () => void }) {
+  const onSuccess = options?.onSuccess;
+
+  return useMutation(
+    (detail: FormattedUser) => {
+      const url = getDetailUrl(detail);
+      const params = merge(
+        {
+          apiVersion: 'iam.kubesphere.io/v1alpha2',
+          kind: 'User',
+        },
+        detail._originData,
+        {
+          status: {
+            state: detail.status === 'Active' ? 'Disabled' : 'Active',
+          },
+          metadata: {
+            resourceVersion: detail.resourceVersion,
+          },
+        },
+      );
+      return request.put(url, params);
+    },
+    { onSuccess },
+  );
 }
