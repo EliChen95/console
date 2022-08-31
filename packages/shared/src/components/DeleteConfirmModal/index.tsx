@@ -39,6 +39,7 @@ interface DeleteConfirmModalProps extends Omit<ModalProps, OmitProps> {
   app?: any;
   title?: ReactNode;
   tip?: ReactNode;
+  desc?: ReactNode;
   confirmLoading?: boolean;
   onOk: () => void;
   onCancel: () => void;
@@ -53,6 +54,7 @@ export function DeleteConfirmModal({
   app,
   title: titleProp,
   tip: tipProp,
+  desc,
   confirmLoading,
   onCancel,
   onOk,
@@ -145,6 +147,7 @@ export function DeleteConfirmModal({
               onChange={handleConfirmResourceChange}
             />
           )}
+          {desc}
         </Content>
       </Body>
       <Footer>
