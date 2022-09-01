@@ -43,7 +43,19 @@ export const getDisplayName = <T extends Record<string, any>>(item: T): string =
   return `${item.name}${item.aliasName ? `(${item.aliasName})` : ''}`;
 };
 
-export const getOriginData = <T extends Record<string, any>>(item: T) =>
+type OmitKeys =
+  | 'status'
+  | 'metadata.uid'
+  | 'metadata.selfLink'
+  | 'metadata.generation'
+  | 'metadata.ownerReferences'
+  | 'metadata.resourceVersion'
+  | 'metadata.creationTimestamp'
+  | 'metadata.managedFields';
+
+export type OriginData<T extends Record<string, any> = Record<string, any>> = Omit<T, OmitKeys>;
+
+export const getOriginData = <T extends Record<string, any>>(item: T): OriginData<T> =>
   omit(item, [
     'status',
     'metadata.uid',

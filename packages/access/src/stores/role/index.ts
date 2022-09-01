@@ -15,7 +15,7 @@ function getResourceUrl(params?: GetPathParams) {
 
 function formatRole(item: OriginalRole, kind: FormatRoleKind) {
   return {
-    ...getRoleBaseInfo(item, kind),
+    ...getRoleBaseInfo<OriginalRole>(item, kind),
     labels: get(item, 'metadata.labels', {}),
     namespace: get(item, 'metadata.namespace'),
     annotations: get(item, 'metadata.annotations'),
@@ -28,7 +28,7 @@ function formatRole(item: OriginalRole, kind: FormatRoleKind) {
       [],
     ),
     rules: get(item, 'rules'),
-    _originData: getOriginData(item),
+    _originData: getOriginData<OriginalRole>(item),
   };
 }
 

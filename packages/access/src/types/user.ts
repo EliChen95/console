@@ -1,4 +1,4 @@
-import { BaseInfo } from '@ks-console/shared';
+import { BaseInfo, OriginData } from '@ks-console/shared';
 
 interface OriginalUser {
   apiVersion?: string;
@@ -56,7 +56,7 @@ interface FormattedUser extends BaseInfo {
   status: string;
   conditions: any[];
   lastLoginTime: string;
-  _originData: Record<string, any>;
+  _originData: OriginData<OriginalUser>;
 }
 
 interface UserFormValues {

@@ -56,7 +56,7 @@ export function formatUser(item: OriginalUser): FormattedUser {
     status: get(item, 'status.state', 'Pending'),
     conditions: get(item, 'status.conditions', []),
     lastLoginTime: get(item, 'status.lastLoginTime'),
-    _originData: getOriginData(item),
+    _originData: getOriginData<OriginalUser>(item),
   };
 }
 
