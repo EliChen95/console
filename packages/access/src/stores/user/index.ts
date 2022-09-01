@@ -2,6 +2,7 @@ import { get, noop, merge } from 'lodash';
 import { useMutation } from 'react-query';
 import { notify } from '@kubed/components';
 import { useUrl, getBaseInfo, getOriginData, request, cookie } from '@ks-console/shared';
+import type { BaseInfo } from '@ks-console/shared';
 
 import type { GetPathParams } from '../../types';
 import type { OriginalUser, UserCreateParams, UserEditParams } from '../../types/user';
@@ -37,7 +38,7 @@ export function getResourceUrl(params?: GetPathParams) {
 
 export const getListUrl = getResourceUrl;
 
-export function formatUser(item: OriginalUser) {
+export function formatUser(item: OriginalUser): FormattedUser {
   return {
     ...getBaseInfo(item),
     username: get(item, 'metadata.name', ''),
@@ -55,7 +56,20 @@ export function formatUser(item: OriginalUser) {
   };
 }
 
-export type FormattedUser = ReturnType<typeof formatUser>;
+export interface FormattedUser extends BaseInfo {
+  username: string;
+  email: string;
+  role: string;
+  globalrole: string;
+  clusterrole: string;
+  workspacerole: string;
+  roleBind: string;
+  groups: any[];
+  status: string;
+  conditions: any[];
+  lastLoginTime: string;
+  _originData: Record<string, any>;
+}
 
 export function useUserCreateMutation(options?: { onSuccess?: () => void }) {
   const onSuccess = options?.onSuccess;

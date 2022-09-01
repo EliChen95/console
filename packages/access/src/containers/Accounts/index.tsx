@@ -46,33 +46,34 @@ export default function Accounts() {
   const columns: Column[] = [
     {
       title: t('NAME'),
-      field: 'metadata.name',
+      field: 'username',
       render: (value, row) => (
         <Field
           value={<Link to={value}>{value}</Link>}
-          label={row?.spec?.email || ''}
-          avatar={<Avatar src={row?.avatar_url || '/assets/default-user.svg'} alt={value} />}
+          label={row.email}
+          avatar={<Avatar src={row.avatar_url || '/assets/default-user.svg'} alt={value} />}
         />
       ),
     },
     {
       title: t('STATUS'),
-      field: 'status.state',
+      field: 'status',
       canHide: true,
       width: '20%',
       render: value => (
-        <StatusIndicator type={value}>{t(`USER_${(value ?? '').toUpperCase()}`)}</StatusIndicator>
+        <StatusIndicator type={value}>{t(`USER_${value.toUpperCase()}`)}</StatusIndicator>
       ),
     },
     {
       title: t('PLATFORM_ROLE'),
+      field: 'globalrole',
       canHide: true,
       width: '20%',
-      render: (value, row) => row?.metadata?.annotations?.['iam.kubesphere.io/globalrole'] || '-',
+      render: value => value || '-',
     },
     {
       title: t('LAST_LOGIN'),
-      field: 'status.lastLoginTime',
+      field: 'lastLoginTime',
       canHide: true,
       width: '20%',
       render: value => (value ? formatTime(value) : t('NOT_LOGIN_YET')),
@@ -81,7 +82,7 @@ export default function Accounts() {
       title: ' ',
       // TODO: temp
       render: (value, row) => {
-        const formattedUser = formatUser(row as OriginalUser);
+        const formattedUser = row as FormattedUser;
 
         return (
           <>
@@ -141,6 +142,7 @@ export default function Accounts() {
         tableName="users"
         rowKey="name"
         url={url}
+        format={data => formatUser(data as OriginalUser)}
         placeholder={t('SEARCH_BY_NAME')}
         simpleSearch
         batchActions={batchActions}

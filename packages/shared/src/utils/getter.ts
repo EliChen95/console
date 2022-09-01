@@ -55,6 +55,17 @@ export const getOriginData = (item: any) =>
     'metadata.managedFields',
   ]);
 
+export interface BaseInfo {
+  uid: string | undefined;
+  name: string | undefined;
+  creator: string;
+  description: string;
+  aliasName: string;
+  createTime: string;
+  resourceVersion: string | undefined;
+  isFedManaged: boolean;
+}
+
 export const getBaseInfo = (item: any) => ({
   uid: get(item, 'metadata.uid'),
   name: get(item, 'metadata.name'),
