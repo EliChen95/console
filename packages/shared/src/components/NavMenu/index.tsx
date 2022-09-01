@@ -57,7 +57,6 @@ const NavMenu = ({ navs, prefix, disabled, pathname }: NavMenuProps) => {
         <InnerWrapper key={nav.name}>
           {nav.title && <p>{t(nav.title)}</p>}
           <ul>
-            {/* TODO: navs bug */}
             {nav.children.map((item: any) => (
               <NavItem
                 key={item.name}

@@ -42,8 +42,7 @@ const getClusterNavs = (cluster?: string) => {
   });
   if (!isEmpty(filteredItems)) {
     checkClusterVersionRequired(filteredItems, cluster);
-    // TODO: navs bug
-    navs.push({ ...clusterNavs, items: filteredItems });
+    navs.push({ ...clusterNavs, children: filteredItems });
   }
   return navs;
 };
