@@ -17,9 +17,9 @@ interface Action<T extends Record<string, unknown>> {
   action?: string;
   icon?: ReactNode | ((record: T) => ReactNode);
   text?: ReactNode | ((record: T) => ReactNode);
-  disabled?: boolean | ((record?: T) => boolean);
-  show?: boolean | ((record?: T) => boolean);
-  onClick?: (e: MouseEvent<HTMLButtonElement>, record?: T) => void;
+  disabled?: boolean | ((record: T) => boolean);
+  show?: boolean | ((record: T) => boolean);
+  onClick?: (e: MouseEvent<HTMLButtonElement>, record: T) => void;
   render?: (record?: T) => ReactNode;
   props?: Record<string, any>;
 }

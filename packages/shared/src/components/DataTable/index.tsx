@@ -130,6 +130,8 @@ function DataTableComponent<T extends Record<string, any>>(
   const [, setStorageState] = useLocalStorage({ key: `tableState:${tableName}` });
   const initialState = getInitialState(tableName, useStorageState);
 
+  console.log(batchActions);
+
   const [{ pageIndex, pageSize, totalCount, filters, sortBy }, dispatch] = useReducer(
     reducer,
     initialState,

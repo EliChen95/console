@@ -19,7 +19,7 @@ import {
 } from '../../stores/user';
 import UserCreateModal from './UserCreateModal';
 import UserEditModal from './UserEditModal';
-import { Avatar, CreateButton, BatchActionButton } from './styles';
+import { Avatar } from './styles';
 
 export default function Accounts() {
   const [userCreateModalVisible, setUserCreateModalVisible] = useState(false);
@@ -27,8 +27,8 @@ export default function Accounts() {
   const [userDeleteModalVisible, setUserDeleteModalVisible] = useState(false);
   const [detail, setDetail] = useState<FormattedUser>();
   const [resource, setResource] = useState<DeleteConfirmModalProps['resource']>();
-  const ref = useRef<{ refetch: () => void }>(null);
-  const refetchData = ref.current?.refetch ?? noop;
+  const tableRef = useRef<{ refetch: () => void }>(null);
+  const refetchData = tableRef.current?.refetch ?? noop;
 
   const { mutate: mutateUserStatus } = useUserStatusMutation({
     onSuccess: () => {
@@ -45,7 +45,7 @@ export default function Accounts() {
     },
   });
 
-  const { renderItemAction } = useAction({
+  const { renderTableAction, renderItemAction, renderBatchAction } = useAction({
     authKey: module,
     itemAction: [
       {
@@ -82,8 +82,40 @@ export default function Accounts() {
         },
       },
     ],
-    tableAction: [],
-    batchAction: [],
+    tableAction: [
+      {
+        key: 'create',
+        action: 'create',
+        text: t('CREATE'),
+        props: {
+          color: 'secondary',
+          shadow: true,
+        },
+        onClick: () => setUserCreateModalVisible(true),
+      },
+    ],
+    batchAction: [
+      {
+        key: 'delete',
+        action: 'delete',
+        text: t('DELETE'),
+        props: {
+          color: 'error',
+        },
+      },
+      {
+        key: 'active',
+        action: 'edit',
+        text: t('ENABLE'),
+        // disabled: activeStatus,
+      },
+      {
+        key: 'disabled',
+        action: 'edit',
+        text: t('DISABLE'),
+        // disabled: disabledStatus,
+      },
+    ],
   });
 
   const columns: Column[] = [
@@ -129,13 +161,6 @@ export default function Accounts() {
   ];
   // TODO: missing params ?
   const url = getResourceUrl();
-  const batchActions = [
-    <BatchActionButton key="delete" color="error">
-      {t('DELETE')}
-    </BatchActionButton>,
-    <BatchActionButton key="active">{t('ENABLE')}</BatchActionButton>,
-    <BatchActionButton key="disabled">{t('DISABLE')}</BatchActionButton>,
-  ];
 
   const handleUserDelete = () => {
     if (!detail) {
@@ -153,7 +178,7 @@ export default function Accounts() {
       <Banner icon={<Human />} title={t('USER_PL')} description={t('USER_DESC')} className="mb12" />
       {/* TODO: missing search */}
       <DataTable
-        ref={ref}
+        ref={tableRef}
         columns={columns}
         tableName="users"
         rowKey="name"
@@ -161,15 +186,15 @@ export default function Accounts() {
         format={data => formatUser(data as OriginalUser)}
         placeholder={t('SEARCH_BY_NAME')}
         simpleSearch
-        batchActions={batchActions}
+        batchActions={renderBatchAction()}
+        /*batchActions={
+              <>
+                <div>1</div>
+                <div>2</div>
+              </>
+            }*/
         disableRowSelect={row => !showAction(row as FormattedUser)}
-        toolbarRight={
-          <>
-            <CreateButton color="secondary" shadow onClick={() => setUserCreateModalVisible(true)}>
-              {t('CREATE')}
-            </CreateButton>
-          </>
-        }
+        toolbarRight={renderTableAction()}
       />
       {userCreateModalVisible && (
         <UserCreateModal
