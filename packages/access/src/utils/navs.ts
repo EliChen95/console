@@ -8,7 +8,9 @@ export function getAccessNavs() {
     return checkNavItem(item, params => hasPermission({ ...params }));
   });
   if (!isEmpty(filteredItems)) {
+    // TODO: navs bug
     navs.push({ ...accessNavs, items: filteredItems });
   }
+
   return navs;
 }

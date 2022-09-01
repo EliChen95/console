@@ -10,6 +10,7 @@ import Roles from '../containers/Roles';
 import { getAccessNavs } from '../utils/navs';
 
 const navs = getAccessNavs();
+// TODO: navs bug
 const indexPath = get(navs, '[0].children[0].name');
 
 export default [

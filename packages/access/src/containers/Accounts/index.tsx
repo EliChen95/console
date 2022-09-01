@@ -2,17 +2,20 @@ import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { noop } from 'lodash';
 import { Banner, Field, notify } from '@kubed/components';
-import { Human /*Pen, Stop, Star, Trash*/ } from '@kubed/icons';
-import { DataTable, formatTime, StatusIndicator, DeleteConfirmModal } from '@ks-console/shared';
+import { Human, Pen, Stop, Star, Trash } from '@kubed/icons';
 import type { Column, DeleteConfirmModalProps } from '@ks-console/shared';
+import { DataTable, formatTime, StatusIndicator, DeleteConfirmModal } from '@ks-console/shared';
 
 import type { OriginalUser, FormattedUser } from '../../types/user';
+import { useAction } from '../../hooks/useAction';
 import {
+  module,
   getResourceUrl,
   formatUser,
   useUserStatusMutation,
   useUserDeleteMutation,
   validateUserDelete,
+  showAction,
 } from '../../stores/user';
 import UserCreateModal from './UserCreateModal';
 import UserEditModal from './UserEditModal';
@@ -40,6 +43,47 @@ export default function Accounts() {
       notify.success(t('DELETE_SUCCESSFUL'));
       setUserDeleteModalVisible(false);
     },
+  });
+
+  const { renderItemAction } = useAction({
+    authKey: module,
+    itemAction: [
+      {
+        key: 'edit',
+        action: 'edit',
+        icon: <Pen />,
+        text: t('EDIT'),
+        show: showAction,
+        onClick: (event, item) => {
+          setDetail(item);
+          setUserEditModalVisible(true);
+        },
+      },
+      {
+        key: 'status',
+        action: 'edit',
+        icon: item => (item.status === 'Active' ? <Stop /> : <Star />),
+        text: item => (item.status === 'Active' ? t('DISABLE') : t('ENABLE')),
+        show: showAction,
+        onClick: (event, item) => {
+          mutateUserStatus(item);
+        },
+      },
+      {
+        key: 'delete',
+        action: 'delete',
+        icon: <Trash />,
+        text: t('DELETE'),
+        show: showAction,
+        onClick: (event, item) => {
+          setDetail(item);
+          setResource(item.username);
+          setUserDeleteModalVisible(true);
+        },
+      },
+    ],
+    tableAction: [],
+    batchAction: [],
   });
 
   const columns: Column[] = [
@@ -78,36 +122,9 @@ export default function Accounts() {
       render: value => (value ? formatTime(value) : t('NOT_LOGIN_YET')),
     },
     {
+      id: 'more',
       title: ' ',
-      // TODO: temp
-      render: (value, row) => {
-        const formattedUser = row as FormattedUser;
-
-        return (
-          <>
-            <CreateButton
-              onClick={() => {
-                setDetail(formattedUser);
-                setUserEditModalVisible(true);
-              }}
-            >
-              {t('EDIT')}
-            </CreateButton>
-            <CreateButton onClick={() => mutateUserStatus(formattedUser)}>
-              {formattedUser.status === 'Active' ? t('DISABLE') : t('ENABLE')}
-            </CreateButton>
-            <CreateButton
-              onClick={() => {
-                setDetail(formattedUser);
-                setResource(formattedUser.username);
-                setUserDeleteModalVisible(true);
-              }}
-            >
-              {t('DELETE')}
-            </CreateButton>
-          </>
-        );
-      },
+      render: (value, row) => renderItemAction(value, row as FormattedUser),
     },
   ];
   // TODO: missing params ?
@@ -145,10 +162,7 @@ export default function Accounts() {
         placeholder={t('SEARCH_BY_NAME')}
         simpleSearch
         batchActions={batchActions}
-        disableRowSelect={row => {
-          const name = row?.metadata?.name;
-          return globals.config.presetUsers.includes(name) || globals.user.username === name;
-        }}
+        disableRowSelect={row => !showAction(row as FormattedUser)}
         toolbarRight={
           <>
             <CreateButton color="secondary" shadow onClick={() => setUserCreateModalVisible(true)}>

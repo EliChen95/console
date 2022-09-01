@@ -11,7 +11,7 @@ import type {
   UserEditParams,
 } from '../../types/user';
 
-const module = 'users';
+export const module = 'users';
 
 const { getPath, getDetailUrl } = useUrl({ module });
 
@@ -58,6 +58,10 @@ export function formatUser(item: OriginalUser): FormattedUser {
     lastLoginTime: get(item, 'status.lastLoginTime'),
     _originData: getOriginData<OriginalUser>(item),
   };
+}
+
+export function showAction(item: FormattedUser) {
+  return !globals.config.presetUsers.includes(item.name) && globals.user.username !== item.name;
 }
 
 export function useUserCreateMutation(options?: { onSuccess?: () => void }) {
