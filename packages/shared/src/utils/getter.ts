@@ -99,7 +99,7 @@ export const getRoleBaseInfo = <T extends Record<string, any>>(
   if (!get(labels, ['iam.kubesphere.io/role-template'])) {
     switch (module) {
       case 'workspaceroles': {
-        const label = get(labels, ['kubesphere.io/workspace']);
+        const label = get(labels, ['kubesphere.io/workspace'], '');
         const name = baseInfo.name.slice(label.length + 1);
         if (globals.config.presetWorkspaceRoles.includes(name)) {
           baseInfo.description = t(`ROLE_WORKSPACE_${name.toUpperCase().replace(/-/g, '_')}`);
