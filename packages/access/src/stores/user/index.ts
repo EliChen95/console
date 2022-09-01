@@ -44,7 +44,7 @@ export const getListUrl = getResourceUrl;
 
 export function formatUser(item: OriginalUser): FormattedUser {
   return {
-    ...getBaseInfo(item),
+    ...getBaseInfo<OriginalUser>(item),
     username: get(item, 'metadata.name', ''),
     email: get(item, 'spec.email', ''),
     role: get(item, 'metadata.annotations["iam.kubesphere.io/role"]', ''),
