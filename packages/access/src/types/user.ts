@@ -1,3 +1,5 @@
+import { BaseInfo } from '@ks-console/shared';
+
 interface OriginalUser {
   apiVersion?: string;
   kind?: string;
@@ -42,6 +44,21 @@ interface OriginalUser {
   };
 }
 
+interface FormattedUser extends BaseInfo {
+  username: string;
+  email: string;
+  role: string;
+  globalrole: string;
+  clusterrole: string;
+  workspacerole: string;
+  roleBind: string;
+  groups: any[];
+  status: string;
+  conditions: any[];
+  lastLoginTime: string;
+  _originData: Record<string, any>;
+}
+
 interface UserFormValues {
   metadata: {
     name: string;
@@ -83,4 +100,11 @@ type UserEditParams = UserActionValues & {
   [key: string]: any;
 };
 
-export type { OriginalUser, UserFormValues, UserActionValues, UserCreateParams, UserEditParams };
+export type {
+  OriginalUser,
+  FormattedUser,
+  UserFormValues,
+  UserActionValues,
+  UserCreateParams,
+  UserEditParams,
+};

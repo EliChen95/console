@@ -2,10 +2,14 @@ import { get, noop, merge } from 'lodash';
 import { useMutation } from 'react-query';
 import { notify } from '@kubed/components';
 import { useUrl, getBaseInfo, getOriginData, request, cookie } from '@ks-console/shared';
-import type { BaseInfo } from '@ks-console/shared';
 
 import type { GetPathParams } from '../../types';
-import type { OriginalUser, UserCreateParams, UserEditParams } from '../../types/user';
+import type {
+  OriginalUser,
+  FormattedUser,
+  UserCreateParams,
+  UserEditParams,
+} from '../../types/user';
 
 const module = 'users';
 
@@ -54,21 +58,6 @@ export function formatUser(item: OriginalUser): FormattedUser {
     lastLoginTime: get(item, 'status.lastLoginTime'),
     _originData: getOriginData(item),
   };
-}
-
-export interface FormattedUser extends BaseInfo {
-  username: string;
-  email: string;
-  role: string;
-  globalrole: string;
-  clusterrole: string;
-  workspacerole: string;
-  roleBind: string;
-  groups: any[];
-  status: string;
-  conditions: any[];
-  lastLoginTime: string;
-  _originData: Record<string, any>;
 }
 
 export function useUserCreateMutation(options?: { onSuccess?: () => void }) {

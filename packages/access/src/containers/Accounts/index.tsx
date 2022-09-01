@@ -6,8 +6,7 @@ import { Human /*Pen, Stop, Star, Trash*/ } from '@kubed/icons';
 import { DataTable, formatTime, StatusIndicator, DeleteConfirmModal } from '@ks-console/shared';
 import type { Column, DeleteConfirmModalProps } from '@ks-console/shared';
 
-import type { OriginalUser } from '../../types/user';
-import type { FormattedUser } from '../../stores/user';
+import type { OriginalUser, FormattedUser } from '../../types/user';
 import {
   getResourceUrl,
   formatUser,

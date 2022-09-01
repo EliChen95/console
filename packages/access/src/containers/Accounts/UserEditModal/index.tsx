@@ -2,10 +2,9 @@ import React from 'react';
 import { merge } from 'lodash';
 import { notify } from '@kubed/components';
 
-import type { UserActionValues } from '../../../types/user';
+import type { FormattedUser, UserActionValues } from '../../../types/user';
 import type { UserBaseModalProps } from '../UserBaseModal';
 import UserBaseModal from '../UserBaseModal';
-import type { FormattedUser } from '../../../stores/user';
 import { useUserEditMutation } from '../../../stores/user';
 
 interface UserCreateModalProps {
