@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { noop } from 'lodash';
 import { Banner, Field, notify } from '@kubed/components';
@@ -30,6 +30,9 @@ export default function Accounts() {
   const tableRef = useRef<TableRef<OriginalUser>>(null);
   const refetchData = tableRef.current?.refetch ?? noop;
 
+  // TODO: onSelect has a bug, need Improvement
+  let selectedFlatRows: FormattedUser[] = [];
+
   const { mutate: mutateUserStatus } = useUserStatusMutation({
     onSuccess: () => {
       refetchData();
@@ -44,11 +47,6 @@ export default function Accounts() {
       setUserDeleteModalVisible(false);
     },
   });
-
-  const handleDisabled = () => {
-    console.log(tableRef.current?.getSelectedRowIds());
-    console.log(tableRef.current?.getSelectedFlatRows());
-  };
 
   const { renderTableAction, renderItemAction, renderBatchAction } = useAction({
     authKey: module,
@@ -112,16 +110,13 @@ export default function Accounts() {
         key: 'active',
         action: 'edit',
         text: t('ENABLE'),
-        disabled: () => {
-          handleDisabled();
-          return false;
-        },
+        disabled: () => selectedFlatRows.every(item => item.status === 'Active'),
       },
       {
         key: 'disabled',
         action: 'edit',
         text: t('DISABLE'),
-        // disabled: disabledStatus,
+        disabled: () => selectedFlatRows.every(item => item.status === 'Disabled'),
       },
     ],
   });
@@ -197,6 +192,9 @@ export default function Accounts() {
         batchActions={renderBatchAction()}
         disableRowSelect={row => !showAction(row as FormattedUser)}
         toolbarRight={renderTableAction()}
+        onSelect={(selectedRowIds, selectedRows) => {
+          selectedFlatRows = selectedRows as FormattedUser[];
+        }}
       />
       {userCreateModalVisible && (
         <UserCreateModal

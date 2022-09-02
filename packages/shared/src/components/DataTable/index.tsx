@@ -128,7 +128,7 @@ function hasContent(value: ReactNode) {
   return true;
 }
 
-function DataTableComponent<T extends Record<string, any>>(
+function DataTableComponent<T extends Record<string, any> = Record<string, any>>(
   props: PropsWithChildren<TableProps<T>>,
   ref: React.Ref<unknown> | undefined,
 ): ReactElement {
@@ -152,6 +152,7 @@ function DataTableComponent<T extends Record<string, any>>(
     useStorageState,
     format,
     disableRowSelect,
+    onSelect,
   } = props;
   const [, setStorageState] = useLocalStorage({ key: `tableState:${tableName}` });
   const initialState = getInitialState(tableName, useStorageState);
@@ -245,14 +246,17 @@ function DataTableComponent<T extends Record<string, any>>(
     dispatch({ type: TOTAL_COUNT_CHANGED, payload: serverData?.totalItems });
   }, [serverData?.totalItems]);
 
+  // TODO: onSelect has a bug, need Improvement
+  useEffect(() => {
+    onSelect?.(state.selectedRowIds ?? {}, selectedFlatRows?.map(d => d.original) ?? []);
+  }, [state.selectedRowIds]);
+
   const tableRef = useRef<TableRef<T>>();
 
   useImperativeHandle(ref, () => ({
-    refetch: () => {
-      refetch();
-    },
-    getSelectedRowIds: () => debouncedState?.selectedRowIds || {},
-    getSelectedFlatRows: () => selectedFlatRows?.map(d => d.original) || [],
+    refetch,
+    getSelectedRowIds: () => debouncedState?.selectedRowIds ?? {},
+    getSelectedFlatRows: () => selectedFlatRows?.map(d => d.original) ?? [],
   }));
 
   return (
