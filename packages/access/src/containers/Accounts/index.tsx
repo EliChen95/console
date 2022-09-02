@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { noop } from 'lodash';
 import { Banner, Field, notify } from '@kubed/components';
