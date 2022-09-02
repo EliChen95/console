@@ -1,6 +1,4 @@
 import React, {
-  PropsWithChildren,
-  ReactElement,
   useMemo,
   useReducer,
   useEffect,
@@ -8,6 +6,7 @@ import React, {
   useImperativeHandle,
   forwardRef,
 } from 'react';
+import type { PropsWithChildren, ReactElement, ReactNode } from 'react';
 import {
   useTable,
   useFilters,
@@ -102,6 +101,32 @@ const selectionHook = (hooks: Hooks<any>) => {
 const hooks = [useFilters, useSortBy, usePagination, useRowSelect];
 const withSelectionHooks = [...hooks, selectionHook];
 
+function hasContent(value: ReactNode) {
+  if (value === undefined || value === null) {
+    return false;
+  }
+
+  const type = typeof value;
+
+  if (type === 'boolean') {
+    return false;
+  }
+
+  if (type === 'number') {
+    return true;
+  }
+
+  if (typeof value === 'string') {
+    return !!value.trim();
+  }
+
+  if (Array.isArray(value)) {
+    return value.length > 0;
+  }
+
+  return true;
+}
+
 function DataTableComponent<T extends Record<string, any>>(
   props: PropsWithChildren<TableProps<T>>,
   ref: React.Ref<unknown> | undefined,
@@ -119,7 +144,7 @@ function DataTableComponent<T extends Record<string, any>>(
     toolbarRight,
     rowKey,
     placeholder,
-    selectType = 'checkbox',
+    selectType = hasContent(batchActions) ? 'checkbox' : false,
     url,
     emptyPlaceholder,
     tableName,
@@ -129,8 +154,6 @@ function DataTableComponent<T extends Record<string, any>>(
   } = props;
   const [, setStorageState] = useLocalStorage({ key: `tableState:${tableName}` });
   const initialState = getInitialState(tableName, useStorageState);
-
-  console.log(batchActions);
 
   const [{ pageIndex, pageSize, totalCount, filters, sortBy }, dispatch] = useReducer(
     reducer,

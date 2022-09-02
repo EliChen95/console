@@ -187,12 +187,6 @@ export default function Accounts() {
         placeholder={t('SEARCH_BY_NAME')}
         simpleSearch
         batchActions={renderBatchAction()}
-        /*batchActions={
-              <>
-                <div>1</div>
-                <div>2</div>
-              </>
-            }*/
         disableRowSelect={row => !showAction(row as FormattedUser)}
         toolbarRight={renderTableAction()}
       />
