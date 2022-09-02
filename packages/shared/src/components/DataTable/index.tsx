@@ -35,6 +35,7 @@ import {
   getInitialState,
   useDidUpdate,
 } from './utils';
+import type { TableRef } from './utils';
 import {
   PAGE_CHANGED,
   SORTBY_CHANGED,
@@ -43,7 +44,7 @@ import {
   TOTAL_COUNT_CHANGED,
 } from './reducer';
 
-export type { Column, TableProps };
+export type { Column, TableProps, TableRef };
 
 const selectionHook = (hooks: Hooks<any>) => {
   hooks.getToggleAllRowsSelectedProps = [
@@ -244,7 +245,7 @@ function DataTableComponent<T extends Record<string, any>>(
     dispatch({ type: TOTAL_COUNT_CHANGED, payload: serverData?.totalItems });
   }, [serverData?.totalItems]);
 
-  const tableRef = useRef();
+  const tableRef = useRef<TableRef<T>>();
 
   useImperativeHandle(ref, () => ({
     refetch: () => {

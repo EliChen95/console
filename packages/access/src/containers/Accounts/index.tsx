@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { noop } from 'lodash';
 import { Banner, Field, notify } from '@kubed/components';
 import { Human, Pen, Stop, Star, Trash } from '@kubed/icons';
-import type { Column, DeleteConfirmModalProps } from '@ks-console/shared';
+import type { Column, TableRef, DeleteConfirmModalProps } from '@ks-console/shared';
 import { DataTable, formatTime, StatusIndicator, DeleteConfirmModal } from '@ks-console/shared';
 
 import type { OriginalUser, FormattedUser } from '../../types/user';
@@ -27,7 +27,7 @@ export default function Accounts() {
   const [userDeleteModalVisible, setUserDeleteModalVisible] = useState(false);
   const [detail, setDetail] = useState<FormattedUser>();
   const [resource, setResource] = useState<DeleteConfirmModalProps['resource']>();
-  const tableRef = useRef<{ refetch: () => void }>(null);
+  const tableRef = useRef<TableRef<OriginalUser>>(null);
   const refetchData = tableRef.current?.refetch ?? noop;
 
   const { mutate: mutateUserStatus } = useUserStatusMutation({
@@ -44,6 +44,11 @@ export default function Accounts() {
       setUserDeleteModalVisible(false);
     },
   });
+
+  const handleDisabled = () => {
+    console.log(tableRef.current?.getSelectedRowIds());
+    console.log(tableRef.current?.getSelectedFlatRows());
+  };
 
   const { renderTableAction, renderItemAction, renderBatchAction } = useAction({
     authKey: module,
@@ -107,7 +112,10 @@ export default function Accounts() {
         key: 'active',
         action: 'edit',
         text: t('ENABLE'),
-        // disabled: activeStatus,
+        disabled: () => {
+          handleDisabled();
+          return false;
+        },
       },
       {
         key: 'disabled',

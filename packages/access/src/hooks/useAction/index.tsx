@@ -17,7 +17,7 @@ interface Action<T extends Record<string, unknown>> {
   action?: string;
   icon?: ReactNode | ((record: T) => ReactNode);
   text?: ReactNode | ((record: T) => ReactNode);
-  disabled?: boolean | ((record: T) => boolean);
+  disabled?: boolean | ((record?: T) => boolean);
   show?: boolean | ((record: T) => boolean);
   onClick?: (e: MouseEvent<HTMLButtonElement>, record: T) => void;
   render?: (record?: T) => ReactNode;
@@ -50,7 +50,7 @@ function renderByActionList<T extends Record<string, unknown>>(
         component,
         {
           key: action.key,
-          disabled: action.disabled,
+          disabled: isFunction(action.disabled) ? action.disabled() : action.disabled,
           onClick: action.onClick,
           ...(action.props || {}),
         },

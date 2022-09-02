@@ -66,7 +66,7 @@ export interface TableProps<T extends Record<string, any>> {
   toolbarRight?: React.ReactNode;
 }
 
-export interface TableRef<T> {
+export interface TableRef<T extends Record<string, any> = Record<string, any>> {
   refetch: () => void;
   getSelectedRowIds: () => Record<string, boolean>;
   getSelectedFlatRows: () => T[];
