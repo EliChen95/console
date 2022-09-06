@@ -30,9 +30,6 @@ export default function Accounts() {
   const tableRef = useRef<TableRef<OriginalUser>>(null);
   const refetchData = tableRef.current?.refetch ?? noop;
 
-  // TODO: onSelect has a bug, need Improvement
-  let selectedFlatRows: FormattedUser[] = [];
-
   const { mutate: mutateUserStatus } = useUserStatusMutation({
     onSuccess: () => {
       refetchData();
@@ -110,13 +107,14 @@ export default function Accounts() {
         key: 'active',
         action: 'edit',
         text: t('ENABLE'),
-        disabled: () => selectedFlatRows.every(item => item.status === 'Active'),
+        // TODO: batch button disabled
+        // disabled: () => selectedFlatRows.every(item => item.status === 'Active'),
       },
       {
         key: 'disabled',
         action: 'edit',
         text: t('DISABLE'),
-        disabled: () => selectedFlatRows.every(item => item.status === 'Disabled'),
+        // disabled: () => selectedFlatRows.every(item => item.status === 'Disabled'),
       },
     ],
   });
@@ -162,6 +160,7 @@ export default function Accounts() {
       render: (value, row) => renderItemAction(value, row as FormattedUser),
     },
   ];
+
   // TODO: missing params ?
   const url = getResourceUrl();
 
@@ -192,9 +191,6 @@ export default function Accounts() {
         batchActions={renderBatchAction()}
         disableRowSelect={row => !showAction(row as FormattedUser)}
         toolbarRight={renderTableAction()}
-        onSelect={(selectedRowIds, selectedRows) => {
-          selectedFlatRows = selectedRows as FormattedUser[];
-        }}
       />
       {userCreateModalVisible && (
         <UserCreateModal
