@@ -98,28 +98,53 @@ export function useUserEditMutation({
   });
 }
 
+function getStatus(detail: FormattedUser, type?: 'active' | 'disabled') {
+  if (type === 'active') {
+    return 'Active';
+  }
+
+  if (type === 'disabled') {
+    return 'Disabled';
+  }
+
+  return detail.status === 'Active' ? 'Disabled' : 'Active';
+}
+
+function userStatusMutationFn(detail: FormattedUser, type?: 'active' | 'disabled') {
+  const url = getDetailUrl(detail);
+  const params = merge(
+    {
+      apiVersion: 'iam.kubesphere.io/v1alpha2',
+      kind: 'User',
+    },
+    detail._originData,
+    {
+      status: {
+        state: getStatus(detail, type),
+      },
+      metadata: {
+        resourceVersion: detail.resourceVersion,
+      },
+    },
+  );
+  return request.put(url, params);
+}
+
 export function useUserStatusMutation(options?: { onSuccess?: () => void }) {
   const onSuccess = options?.onSuccess;
+  return useMutation(userStatusMutationFn, { onSuccess });
+}
 
+export function useUsersStatusMutation(options: {
+  type: 'active' | 'disabled';
+  onSuccess?: () => void;
+}) {
+  const type = options.type;
+  const onSuccess = options?.onSuccess;
   return useMutation(
-    (detail: FormattedUser) => {
-      const url = getDetailUrl(detail);
-      const params = merge(
-        {
-          apiVersion: 'iam.kubesphere.io/v1alpha2',
-          kind: 'User',
-        },
-        detail._originData,
-        {
-          status: {
-            state: detail.status === 'Active' ? 'Disabled' : 'Active',
-          },
-          metadata: {
-            resourceVersion: detail.resourceVersion,
-          },
-        },
-      );
-      return request.put(url, params);
+    (details: FormattedUser[]) => {
+      const promises = details.map(detail => userStatusMutationFn(detail, type));
+      return Promise.allSettled(promises);
     },
     { onSuccess },
   );

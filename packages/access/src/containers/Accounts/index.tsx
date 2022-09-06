@@ -2,7 +2,7 @@ import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { noop } from 'lodash';
 import { Banner, Field, notify } from '@kubed/components';
-import { Human, Pen, Stop, Star, Trash } from '@kubed/icons';
+import { Human, Pen, Stop, Start, Trash } from '@kubed/icons';
 import type { Column, TableRef, DeleteConfirmModalProps } from '@ks-console/shared';
 import { DataTable, formatTime, StatusIndicator, DeleteConfirmModal } from '@ks-console/shared';
 
@@ -62,7 +62,7 @@ export default function Accounts() {
       {
         key: 'status',
         action: 'edit',
-        icon: item => (item.status === 'Active' ? <Stop /> : <Star />),
+        icon: item => (item.status === 'Active' ? <Stop /> : <Start />),
         text: item => (item.status === 'Active' ? t('DISABLE') : t('ENABLE')),
         show: showAction,
         onClick: (event, item) => {
