@@ -60,7 +60,6 @@ function runWebpack(config, env = 'production') {
 
 function buildProd(setAlias) {
   if (setAlias === 'true') {
-    console.log('set alias', setAlias);
     webpackProdConfig.resolve.alias = {
       ...webpackProdConfig.resolve.alias,
       ...alias,
