@@ -60,7 +60,7 @@ async function createExtension() {
         type: 'confirm',
         name: 'confirm',
         message: answer => {
-          return `Ensure to create extension: [${answer.extensionName}] ?`;
+          return `Are you sure you want to create extension: [${answer.extensionName}] ?`;
         },
       },
     ]);
