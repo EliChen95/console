@@ -34,7 +34,7 @@ interface RequiredRenderColumn {
 
 export type Column = BaseColumn & (RequiredFieldColumn | RequiredRenderColumn);
 
-export interface TableProps<T extends Record<string, unknown>> {
+export interface TableProps<T extends Record<string, any>> {
   columns: Column[];
   tableName: string;
   rowKey: string;
@@ -44,7 +44,7 @@ export interface TableProps<T extends Record<string, unknown>> {
   footer?: React.ReactNode;
   onChange?: (state: TableState<T>) => any;
   data?: Array<T>;
-  format?: (data: Record<string, unknown>) => T;
+  format?: (data: Record<string, any>) => T;
   initialState?: Record<string, any>;
   manualSortBy?: boolean;
   manualFilters?: boolean;

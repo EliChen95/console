@@ -102,7 +102,7 @@ const selectionHook = (hooks: Hooks<any>) => {
 const hooks = [useFilters, useSortBy, usePagination, useRowSelect];
 const withSelectionHooks = [...hooks, selectionHook];
 
-function DataTableComponent<T extends Record<string, unknown>>(
+function DataTableComponent<T extends Record<string, any>>(
   props: PropsWithChildren<TableProps<T>>,
   ref: React.Ref<unknown> | undefined,
 ): ReactElement {

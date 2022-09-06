@@ -16,22 +16,22 @@ export const getServedVersion = (item: any) => {
   return servedVersion;
 };
 
-export const getResourceCreator = (item: any) =>
+export const getResourceCreator = <T extends Record<string, any>>(item: T): string =>
   get(item, 'metadata.annotations["kubesphere.io/creator"]') ||
   get(item, 'metadata.annotations.creator') ||
   '';
 
-export const getDescription = (item: any) =>
+export const getDescription = <T extends Record<string, any>>(item: T): string =>
   get(item, 'metadata.annotations["kubesphere.io/description"]') ||
   get(item, 'metadata.annotations.desc') ||
   '';
 
-export const getAliasName = (item: any) =>
+export const getAliasName = <T extends Record<string, any>>(item: T): string =>
   get(item, 'metadata.annotations["kubesphere.io/alias-name"]') ||
   get(item, 'metadata.annotations.displayName') ||
   '';
 
-export const getDisplayName = (item: any) => {
+export const getDisplayName = <T extends Record<string, any>>(item: T): string => {
   if (isEmpty(item)) {
     return '';
   }
@@ -43,7 +43,19 @@ export const getDisplayName = (item: any) => {
   return `${item.name}${item.aliasName ? `(${item.aliasName})` : ''}`;
 };
 
-export const getOriginData = (item: any) =>
+type OmitKeys =
+  | 'status'
+  | 'metadata.uid'
+  | 'metadata.selfLink'
+  | 'metadata.generation'
+  | 'metadata.ownerReferences'
+  | 'metadata.resourceVersion'
+  | 'metadata.creationTimestamp'
+  | 'metadata.managedFields';
+
+export type OriginData<T extends Record<string, any> = Record<string, any>> = Omit<T, OmitKeys>;
+
+export const getOriginData = <T extends Record<string, any>>(item: T): OriginData<T> =>
   omit(item, [
     'status',
     'metadata.uid',
@@ -55,28 +67,40 @@ export const getOriginData = (item: any) =>
     'metadata.managedFields',
   ]);
 
-export const getBaseInfo = (item: any) => ({
-  uid: get(item, 'metadata.uid'),
-  name: get(item, 'metadata.name'),
-  creator: getResourceCreator(item),
-  description: getDescription(item),
-  aliasName: getAliasName(item),
+export interface BaseInfo {
+  uid: string;
+  name: string;
+  creator: string;
+  description: string;
+  aliasName: string;
+  createTime: string;
+  resourceVersion: string;
+  isFedManaged: boolean;
+}
+
+export const getBaseInfo = <T extends Record<string, any>>(item: T): BaseInfo => ({
+  uid: get(item, 'metadata.uid', ''),
+  name: get(item, 'metadata.name', ''),
+  creator: getResourceCreator<T>(item),
+  description: getDescription<T>(item),
+  aliasName: getAliasName<T>(item),
   createTime: get(item, 'metadata.creationTimestamp', ''),
-  resourceVersion: get(item, 'metadata.resourceVersion'),
+  resourceVersion: get(item, 'metadata.resourceVersion', ''),
   isFedManaged: get(item, 'metadata.labels["kubefed.io/managed"]') === 'true',
 });
 
-export const getRoleBaseInfo = (
-  item: any,
+export const getRoleBaseInfo = <T extends Record<string, any>>(
+  item: T,
   module: 'workspaceroles' | 'globalroles' | 'clusterroles' | 'roles' | 'devopsroles' | string,
 ) => {
-  const baseInfo = getBaseInfo(item);
+  const baseInfo = getBaseInfo<T>(item);
   const labels = get(item, 'metadata.labels', {});
 
-  if (!labels['iam.kubesphere.io/role-template']) {
+  if (!get(labels, ['iam.kubesphere.io/role-template'])) {
     switch (module) {
       case 'workspaceroles': {
-        const name = baseInfo.name.slice(labels['kubesphere.io/workspace'].length + 1);
+        const label = get(labels, ['kubesphere.io/workspace'], '');
+        const name = baseInfo.name.slice(label.length + 1);
         if (globals.config.presetWorkspaceRoles.includes(name)) {
           baseInfo.description = t(`ROLE_WORKSPACE_${name.toUpperCase().replace(/-/g, '_')}`);
         }
