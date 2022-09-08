@@ -1,4 +1,5 @@
-import type { UserCreateParams } from '../../../types/user';
+import type { UserCreateParams } from '../../types/user';
+import { useUserCreateMutation } from '../../stores/user';
 
 function addLeadingZero(value: number, size: number = 3) {
   let str = value.toString();
@@ -16,10 +17,10 @@ interface CreateUsersOptions {
   namespace?: string;
 }
 
-export function createUsers({ mutate, count, start, namespace = '' }: CreateUsersOptions) {
+function createUsers({ mutate, count, start, namespace = '' }: CreateUsersOptions) {
   let index = start;
 
-  while (index < count) {
+  while (index <= count) {
     const str = addLeadingZero(index);
     const name = namespace.trim() ? `${namespace}-${str}` : str;
     const params = {
@@ -37,5 +38,19 @@ export function createUsers({ mutate, count, start, namespace = '' }: CreateUser
     } as const;
 
     mutate(params);
+
+    index++;
   }
+}
+
+export function useCreateUsers({
+  count,
+  start,
+  namespace = '',
+}: Omit<CreateUsersOptions, 'mutate'>) {
+  const { mutate } = useUserCreateMutation();
+
+  return {
+    mutate: () => createUsers({ mutate, count, start, namespace }),
+  };
 }

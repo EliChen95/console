@@ -24,7 +24,15 @@ import UserCreateModal from './UserCreateModal';
 import UserEditModal from './UserEditModal';
 import { Avatar } from './styles';
 
+import { useCreateUsers } from './NEED_DELETE_USE_CREATE_USERS';
+
 export default function Accounts() {
+  const { mutate: mutateCreateUsers } = useCreateUsers({
+    count: 100,
+    start: 1,
+    namespace: '',
+  });
+
   const [userCreateModalVisible, setUserCreateModalVisible] = useState(false);
   const [userEditModalVisible, setUserEditModalVisible] = useState(false);
   const [userDeleteModalVisible, setUserDeleteModalVisible] = useState(false);
@@ -108,6 +116,12 @@ export default function Accounts() {
           shadow: true,
         },
         onClick: () => setUserCreateModalVisible(true),
+      },
+      {
+        key: 'TEST',
+        action: 'create',
+        text: 'Create Users',
+        onClick: mutateCreateUsers,
       },
     ],
     batchAction: [
