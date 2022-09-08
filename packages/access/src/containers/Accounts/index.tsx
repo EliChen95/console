@@ -1,3 +1,5 @@
+// TODO: WebSocket
+
 import React, { useState, useRef } from 'react';
 import { Link } from 'react-router-dom';
 import { noop } from 'lodash';
@@ -6,7 +8,7 @@ import { Human, Pen, Stop, Start, Trash } from '@kubed/icons';
 import type { Column, TableRef, DeleteConfirmModalProps } from '@ks-console/shared';
 import { DataTable, formatTime, StatusIndicator, DeleteConfirmModal } from '@ks-console/shared';
 
-import type { OriginalUser, FormattedUser } from '../../types/user';
+import type { OriginalUser, FormattedUser, UserStatusMutationType } from '../../types/user';
 import { useAction } from '../../hooks/useAction';
 import {
   module,
@@ -16,6 +18,7 @@ import {
   useUserDeleteMutation,
   validateUserDelete,
   showAction,
+  useUsersStatusMutation,
 } from '../../stores/user';
 import UserCreateModal from './UserCreateModal';
 import UserEditModal from './UserEditModal';
@@ -27,7 +30,7 @@ export default function Accounts() {
   const [userDeleteModalVisible, setUserDeleteModalVisible] = useState(false);
   const [detail, setDetail] = useState<FormattedUser>();
   const [resource, setResource] = useState<DeleteConfirmModalProps['resource']>();
-  const tableRef = useRef<TableRef<OriginalUser>>(null);
+  const tableRef = useRef<TableRef<FormattedUser>>(null);
   const refetchData = tableRef.current?.refetch ?? noop;
 
   const { mutate: mutateUserStatus } = useUserStatusMutation({
@@ -44,6 +47,19 @@ export default function Accounts() {
       setUserDeleteModalVisible(false);
     },
   });
+
+  const { mutate: mutateUsersStatus } = useUsersStatusMutation({
+    onSuccess: () => {
+      refetchData();
+      notify.success(t('UPDATE_SUCCESSFUL'));
+    },
+  });
+  const handleUsersStatus = (type: UserStatusMutationType) => {
+    const details = tableRef.current?.getSelectedFlatRows();
+    if (details) {
+      mutateUsersStatus({ details, type });
+    }
+  };
 
   const { renderTableAction, renderItemAction, renderBatchAction } = useAction({
     authKey: module,
@@ -109,12 +125,14 @@ export default function Accounts() {
         text: t('ENABLE'),
         // TODO: batch button disabled
         // disabled: () => selectedFlatRows.every(item => item.status === 'Active'),
+        onClick: () => handleUsersStatus('active'),
       },
       {
         key: 'disabled',
         action: 'edit',
         text: t('DISABLE'),
         // disabled: () => selectedFlatRows.every(item => item.status === 'Disabled'),
+        onClick: () => handleUsersStatus('disabled'),
       },
     ],
   });

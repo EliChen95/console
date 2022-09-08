@@ -7,6 +7,7 @@ import type { GetPathParams } from '../../types';
 import type {
   OriginalUser,
   FormattedUser,
+  UserStatusMutationType,
   UserCreateParams,
   UserEditParams,
 } from '../../types/user';
@@ -98,7 +99,7 @@ export function useUserEditMutation({
   });
 }
 
-function getStatus(detail: FormattedUser, type?: 'active' | 'disabled') {
+function getStatus(detail: FormattedUser, type?: UserStatusMutationType) {
   if (type === 'active') {
     return 'Active';
   }
@@ -110,7 +111,7 @@ function getStatus(detail: FormattedUser, type?: 'active' | 'disabled') {
   return detail.status === 'Active' ? 'Disabled' : 'Active';
 }
 
-function userStatusMutationFn(detail: FormattedUser, type?: 'active' | 'disabled') {
+function userStatusMutationFn(detail: FormattedUser, type?: UserStatusMutationType) {
   const url = getDetailUrl(detail);
   const params = merge(
     {
@@ -135,14 +136,10 @@ export function useUserStatusMutation(options?: { onSuccess?: () => void }) {
   return useMutation(userStatusMutationFn, { onSuccess });
 }
 
-export function useUsersStatusMutation(options: {
-  type: 'active' | 'disabled';
-  onSuccess?: () => void;
-}) {
-  const type = options.type;
+export function useUsersStatusMutation(options?: { onSuccess?: () => void }) {
   const onSuccess = options?.onSuccess;
   return useMutation(
-    (details: FormattedUser[]) => {
+    ({ details, type }: { details: FormattedUser[]; type?: UserStatusMutationType }) => {
       const promises = details.map(detail => userStatusMutationFn(detail, type));
       return Promise.allSettled(promises);
     },

@@ -59,6 +59,8 @@ interface FormattedUser extends BaseInfo {
   _originData: OriginData<OriginalUser>;
 }
 
+type UserStatusMutationType = 'active' | 'disabled';
+
 interface UserFormValues {
   metadata: {
     name: string;
@@ -103,6 +105,7 @@ type UserEditParams = UserActionValues & {
 export type {
   OriginalUser,
   FormattedUser,
+  UserStatusMutationType,
   UserFormValues,
   UserActionValues,
   UserCreateParams,
