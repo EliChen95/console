@@ -139,8 +139,8 @@ export function useUserStatusMutation(options?: { onSuccess?: () => void }) {
 export function useUsersStatusMutation(options?: { onSuccess?: () => void }) {
   const onSuccess = options?.onSuccess;
   return useMutation(
-    ({ details, type }: { details: FormattedUser[]; type?: UserStatusMutationType }) => {
-      const promises = details.map(detail => userStatusMutationFn(detail, type));
+    ({ items, type }: { items: FormattedUser[]; type?: UserStatusMutationType }) => {
+      const promises = items.map(detail => userStatusMutationFn(detail, type));
       return Promise.allSettled(promises);
     },
     { onSuccess },
@@ -156,13 +156,22 @@ export function validateUserDelete(detail: FormattedUser) {
   return true;
 }
 
+function userDeleteMutationFn(detail: FormattedUser) {
+  const url = getDetailUrl(detail);
+  return request.delete(url);
+}
+
 export function useUserDeleteMutation(options?: { onSuccess?: () => void }) {
   const onSuccess = options?.onSuccess;
+  return useMutation(userDeleteMutationFn, { onSuccess });
+}
 
+export function useUsersDeleteMutation(options?: { onSuccess?: () => void }) {
+  const onSuccess = options?.onSuccess;
   return useMutation(
-    (detail: FormattedUser) => {
-      const url = getDetailUrl(detail);
-      return request.delete(url);
+    (items: FormattedUser[]) => {
+      const promises = items.map(userDeleteMutationFn);
+      return Promise.allSettled(promises);
     },
     { onSuccess },
   );

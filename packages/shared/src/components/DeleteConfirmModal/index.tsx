@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import type { ReactNode, ChangeEvent } from 'react';
+import type { ReactNode, ChangeEvent, MouseEvent } from 'react';
 import { Modal } from '@kubed/components';
 import type { ModalProps } from '@kubed/components';
 import { Close } from '@kubed/icons';
@@ -32,24 +32,52 @@ type OmitProps =
   | 'cancelButtonProps'
   | 'closeIcon';
 
+type Resource = string | number | string[] | number[];
+
 interface DeleteConfirmModalProps extends Omit<ModalProps, OmitProps> {
   type?: string;
-  resource?: string | number | string[] | number[];
+  resource?: Resource;
   deleteCluster?: boolean;
   app?: any;
   title?: ReactNode;
   tip?: ReactNode;
   desc?: ReactNode;
   confirmLoading?: boolean;
-  onOk: () => void;
+  onOk: (
+    event: MouseEvent<HTMLButtonElement>,
+    data: {
+      resource: Resource | undefined;
+      resourceString: string;
+      resourceArray: string[];
+    },
+  ) => void;
   onCancel: () => void;
+}
+
+const SEPARATOR = ', ';
+
+function parseResourceToString(resource: Resource | undefined) {
+  if (typeof resource === 'string' || typeof resource === 'number') {
+    return resource.toString().trim();
+  }
+
+  if (Array.isArray(resource)) {
+    return resource.join(SEPARATOR);
+  }
+
+  return '';
+}
+
+function parseResourceToArray(resource: Resource | undefined) {
+  const resourceString = parseResourceToString(resource);
+  return resourceString.split(SEPARATOR);
 }
 
 export type { DeleteConfirmModalProps };
 
 export function DeleteConfirmModal({
   type,
-  resource: resourceProp,
+  resource: resource,
   deleteCluster,
   app,
   title: titleProp,
@@ -63,19 +91,11 @@ export function DeleteConfirmModal({
   const typeKey = type || undefined;
   const typeKeyLow = type ? `${type}_LOW` : undefined;
   const typeKeyPl = type ? `${type}_PL` : undefined;
-  const resource = (() => {
-    if (resourceProp) {
-      if (Array.isArray(resourceProp)) {
-        return resourceProp.join(', ');
-      }
-
-      return String(resourceProp);
-    }
-
-    return '';
-  })();
-  const hasResourceAndType = resource && type;
-  const isSingleResource = resource.split(', ').length === 1;
+  const resourceString = parseResourceToString(resource);
+  const resourceArray = parseResourceToArray(resource);
+  const data = { resource, resourceString, resourceArray };
+  const hasResourceAndType = resourceString && type;
+  const isSingleResource = resourceArray.length === 1;
   const title = (() => {
     if (titleProp) {
       return titleProp;
@@ -97,28 +117,28 @@ export function DeleteConfirmModal({
     }
 
     if (deleteCluster) {
-      return t('UNBIND_CLUSTER_DESC', { name: resource });
+      return t('UNBIND_CLUSTER_DESC', { name: resourceString });
     }
 
     if (app) {
-      t('DELETE_APP_RESOURCE_TIP', { type, resource, app });
+      t('DELETE_APP_RESOURCE_TIP', { type, resource: resourceString, app });
     }
 
     if (hasResourceAndType) {
       if (isSingleResource) {
         return t('DELETE_RESOURCE_TYPE_DESC_SI', {
           type: t(typeKeyLow),
-          resource,
+          resource: resourceString,
         });
       }
 
       return t('DELETE_RESOURCE_TYPE_DESC_PL', {
         type: t(typeKeyLow),
-        resource,
+        resource: resourceString,
       });
     }
 
-    return t('DELETE_DESC', { resource, type: '' });
+    return t('DELETE_DESC', { resource: resourceString, type: '' });
   })();
 
   const [confirmResource, setConfirmResource] = useState('');
@@ -138,10 +158,10 @@ export function DeleteConfirmModal({
         </Header>
         <Content>
           <Tip as="p" dangerouslySetInnerHTML={{ __html: tip }} />
-          {resource && (
+          {resourceString && (
             <StyledInput
               name="confirmResource"
-              placeholder={resource}
+              placeholder={resourceString}
               autoFocus={true}
               value={confirmResource}
               onChange={handleConfirmResourceChange}
@@ -156,8 +176,8 @@ export function DeleteConfirmModal({
           color="error"
           shadow
           loading={confirmLoading}
-          disabled={confirmLoading || (resource ? resource !== confirmResource : false)}
-          onClick={onOk}
+          disabled={confirmLoading || (resourceString ? resourceString !== confirmResource : false)}
+          onClick={(event: MouseEvent<HTMLButtonElement>) => onOk(event, data)}
         >
           {t('OK')}
         </StyledButton>
@@ -165,3 +185,12 @@ export function DeleteConfirmModal({
     </Modal>
   );
 }
+
+DeleteConfirmModal.parseResourceToString = parseResourceToString;
+
+DeleteConfirmModal.parseResourceToArray = parseResourceToArray;
+
+DeleteConfirmModal.isSingleResource = function isSingleResource(resource: Resource) {
+  const resourceToArray = parseResourceToArray(resource);
+  return resourceToArray.length === 1;
+};

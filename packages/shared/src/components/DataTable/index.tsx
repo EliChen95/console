@@ -254,6 +254,7 @@ function DataTableComponent<T extends Record<string, any> = Record<string, any>>
   const tableRef = useRef<TableRef<T>>();
 
   useImperativeHandle(ref, () => ({
+    instance,
     refetch,
     getSelectedRowIds: () => debouncedState?.selectedRowIds ?? {},
     getSelectedFlatRows: () => selectedFlatRows?.map(d => d.original) ?? [],

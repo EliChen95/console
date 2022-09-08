@@ -15,14 +15,17 @@ import {
   getResourceUrl,
   formatUser,
   useUserStatusMutation,
+  useUsersStatusMutation,
   useUserDeleteMutation,
+  useUsersDeleteMutation,
   validateUserDelete,
   showAction,
-  useUsersStatusMutation,
 } from '../../stores/user';
 import UserCreateModal from './UserCreateModal';
 import UserEditModal from './UserEditModal';
 import { Avatar } from './styles';
+
+const { isSingleResource } = DeleteConfirmModal;
 
 export default function Accounts() {
   const [userCreateModalVisible, setUserCreateModalVisible] = useState(false);
@@ -31,35 +34,41 @@ export default function Accounts() {
   const [detail, setDetail] = useState<FormattedUser>();
   const [resource, setResource] = useState<DeleteConfirmModalProps['resource']>();
   const tableRef = useRef<TableRef<FormattedUser>>(null);
+  const tableInstance = tableRef.current?.instance;
   const refetchData = tableRef.current?.refetch ?? noop;
 
-  const { mutate: mutateUserStatus } = useUserStatusMutation({
-    onSuccess: () => {
-      refetchData();
-      notify.success(t('UPDATE_SUCCESSFUL'));
-    },
-  });
+  const onSetStatusSuccess = () => {
+    refetchData();
+    notify.success(t('UPDATE_SUCCESSFUL'));
+  };
 
-  const { mutate: mutateUserDelete, isLoading: isUserDeleteLoading } = useUserDeleteMutation({
-    onSuccess: () => {
-      refetchData();
-      notify.success(t('DELETE_SUCCESSFUL'));
-      setUserDeleteModalVisible(false);
-    },
+  const onDeleteSuccess = () => {
+    refetchData();
+    notify.success(t('DELETE_SUCCESSFUL'));
+    setUserDeleteModalVisible(false);
+  };
+
+  const { mutate: mutateUserStatus } = useUserStatusMutation({
+    onSuccess: onSetStatusSuccess,
   });
 
   const { mutate: mutateUsersStatus } = useUsersStatusMutation({
-    onSuccess: () => {
-      refetchData();
-      notify.success(t('UPDATE_SUCCESSFUL'));
-    },
+    onSuccess: onSetStatusSuccess,
   });
   const handleUsersStatus = (type: UserStatusMutationType) => {
-    const details = tableRef.current?.getSelectedFlatRows();
-    if (details) {
-      mutateUsersStatus({ details, type });
+    const items = tableRef.current?.getSelectedFlatRows();
+    if (items) {
+      mutateUsersStatus({ items, type });
     }
   };
+
+  const { mutate: mutateUserDelete, isLoading: isUserDeleteLoading } = useUserDeleteMutation({
+    onSuccess: onDeleteSuccess,
+  });
+
+  const { mutate: mutateUsersDelete } = useUsersDeleteMutation({
+    onSuccess: onDeleteSuccess,
+  });
 
   const { renderTableAction, renderItemAction, renderBatchAction } = useAction({
     authKey: module,
@@ -117,6 +126,14 @@ export default function Accounts() {
         text: t('DELETE'),
         props: {
           color: 'error',
+        },
+        onClick: () => {
+          const items = tableRef.current?.getSelectedFlatRows();
+          if (items) {
+            const usernames = items.map(({ username }) => username);
+            setResource(usernames);
+            setUserDeleteModalVisible(true);
+          }
         },
       },
       {
@@ -193,6 +210,20 @@ export default function Accounts() {
     }
   };
 
+  const handleUsersDelete = (resourceArray: string[]) => {
+    const data = tableInstance?.data ?? [];
+    const items = data.filter(item => resourceArray.includes(item.username));
+
+    if (items.length === 0) {
+      return;
+    }
+
+    const result = items.every(validateUserDelete);
+    if (result) {
+      mutateUsersDelete(items);
+    }
+  };
+
   return (
     <>
       <Banner icon={<Human />} title={t('USER_PL')} description={t('USER_DESC')} className="mb12" />
@@ -231,7 +262,13 @@ export default function Accounts() {
           type="USER"
           resource={resource}
           confirmLoading={isUserDeleteLoading}
-          onOk={handleUserDelete}
+          onOk={(event, { resourceArray }) => {
+            if (isSingleResource(resource ?? '')) {
+              handleUserDelete();
+            } else {
+              handleUsersDelete(resourceArray);
+            }
+          }}
           onCancel={() => setUserDeleteModalVisible(false)}
         />
       )}

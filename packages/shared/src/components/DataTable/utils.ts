@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Column as TableColumn, TableState } from 'react-table';
+import type { Column as TableColumn, TableState, TableInstance } from 'react-table';
 import { useQuery } from 'react-query';
 import { useLocalStorage } from '@kubed/hooks';
 import { Suggestions } from './Toolbar';
@@ -67,6 +67,7 @@ export interface TableProps<T extends Record<string, any> = Record<string, any>>
 }
 
 export interface TableRef<T extends Record<string, any> = Record<string, any>> {
+  instance: TableInstance<T>;
   refetch: () => void;
   getSelectedRowIds: () => Record<string, boolean>;
   getSelectedFlatRows: () => T[];
