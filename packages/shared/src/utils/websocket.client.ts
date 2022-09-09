@@ -17,7 +17,7 @@ const DEFAULT_OPTIONS = {
 
 export type { WebSocketClientOptions };
 
-export default class WebSocketClient<T> {
+export class WebSocketClient<T> {
   public readonly url: string | URL;
 
   public readonly options: OptionsProp<T>;
