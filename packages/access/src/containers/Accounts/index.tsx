@@ -256,7 +256,7 @@ export default function Accounts() {
           onCancel={() => setUserEditModalVisible(false)}
         />
       )}
-      {userDeleteModalVisible && detail && (
+      {userDeleteModalVisible && (
         <DeleteConfirmModal
           visible={userDeleteModalVisible}
           type="USER"
