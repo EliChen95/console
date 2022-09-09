@@ -25,7 +25,7 @@ const {
   getSupportGpuList,
 } = require('../services/session');
 
-const { getInstalledExtensions } = require('../services/plugin');
+const { getInstalledExtensions } = require('../services/extension');
 
 const {
   getServerConfig,
@@ -40,7 +40,6 @@ const { client: clientConfig } = getServerConfig();
 
 const renderIndex = async (ctx, params) => {
   const manifest = getManifest();
-  const installedExtensions = await getInstalledExtensions(ctx);
   const importMap = getImportMap();
 
   await ctx.render('index', {
@@ -51,7 +50,6 @@ const renderIndex = async (ctx, params) => {
     importMap: JSON.stringify(importMap),
     globals: JSON.stringify({
       config: clientConfig,
-      installedExtensions,
       manifest,
       ...params,
     }),
@@ -120,14 +118,16 @@ const renderTerminal = async ctx => {
 const renderMarkdown = async ctx => {
   await ctx.render('blank_markdown');
 };
+
 const renderView = async ctx => {
   try {
     const clusterRole = await getClusterRole(ctx);
-    const [user, ksConfig, runtime, supportGpuType] = await Promise.all([
+    const [user, ksConfig, runtime, supportGpuType, installedExtensions] = await Promise.all([
       getCurrentUser(ctx, clusterRole),
       getKSConfig(),
       getK8sRuntime(ctx),
       getSupportGpuList(ctx),
+      getInstalledExtensions(ctx),
     ]);
 
     await renderIndex(ctx, {
@@ -135,6 +135,7 @@ const renderView = async ctx => {
       user,
       runtime,
       clusterRole,
+      installedExtensions,
       config: { ...clientConfig, supportGpuType },
     });
   } catch (err) {
