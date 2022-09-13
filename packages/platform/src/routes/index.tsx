@@ -2,16 +2,17 @@ import React from 'react';
 import { get } from 'lodash';
 import { Navigate } from 'react-router-dom';
 
+import type { Router } from '../types';
 import BaseInfo from '../containers/BaseInfo';
 import { getPlatformSettingsNavs } from '../utils/navs';
 import SettingsLayout from '../containers/SettingsLayout';
-import NotificationConfiguration from '../containers/NotificationConfiguration';
 import NotificationConfigurationRoutes from './notification-configuration';
+import NotificationConfiguration from '../containers/NotificationConfiguration';
 
 const navs = getPlatformSettingsNavs();
 const indexRoutePath = get(navs, '[0].children[0].name', '/404');
 
-export default [
+const routes: Array<Router> = [
   {
     path: '/settings',
     element: <SettingsLayout />,
@@ -32,3 +33,5 @@ export default [
     ],
   },
 ];
+
+export default routes;

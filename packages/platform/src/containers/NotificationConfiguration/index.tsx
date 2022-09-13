@@ -1,23 +1,22 @@
 import React from 'react';
 import { isEmpty } from 'lodash';
-import { Bell } from '@kubed/icons';
-import styled from 'styled-components';
-import { Banner, Navs, Card } from '@kubed/components';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Loudspeaker } from '@kubed/icons';
+import { Outlet, useNavigate, useParams } from 'react-router-dom';
+import { Banner, Navs, Card, Loading } from '@kubed/components';
 
+import ConfigForm from './ConfigForm';
 import type { LabelValue, NavItem } from '../../types';
-import { NOTIFICATION_CONF_NAV_LOCALS_MAP } from '../../constants';
 import { getNotificationConfigurationTabs } from '../../utils/navs';
 
-const PageHeader = styled.div`
-  margin-bottom: 12px;
-`;
+import { CssContainer } from './styles';
 
 function NotificationConfiguration(): JSX.Element {
   const navigate = useNavigate();
+  const { tab = 'mail' } = useParams<any>();
+  const isLoading = false;
   const tabs: NavItem[] = getNotificationConfigurationTabs();
-  const navs: Array<LabelValue> = tabs.map((item: any) => ({
-    label: t(NOTIFICATION_CONF_NAV_LOCALS_MAP[item.name]),
+  const navs: Array<LabelValue> = tabs.map((item: NavItem) => ({
+    label: t(item.title),
     value: item.name,
   }));
 
@@ -26,20 +25,22 @@ function NotificationConfiguration(): JSX.Element {
   }
 
   return (
-    <>
-      <PageHeader>
+    <CssContainer>
+      <div className="mb-12">
         <Banner
-          icon={<Bell />}
+          icon={<Loudspeaker />}
           className="mb12"
           title={t('NOTIFICATION_CONFIGURATION')}
           description={t('NOTIFICATION_CONFIGURATION_DESC')}
         />
-        {!isEmpty(navs) && <Navs onChange={handleNavsChange} data={navs} />}
-      </PageHeader>
+        {!isEmpty(navs) && <Navs value={tab} onChange={handleNavsChange} data={navs} />}
+      </div>
       <Card>
         <Outlet />
+        {isLoading && <Loading className="loading" />}
+        {!isLoading && <ConfigForm currentTab={tab} tabs={tabs} />}
       </Card>
-    </>
+    </CssContainer>
   );
 }
 
