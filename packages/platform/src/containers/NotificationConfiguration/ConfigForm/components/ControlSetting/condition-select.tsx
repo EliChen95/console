@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Icon } from '@ks-console/shared';
-import { Button, Select } from '@kubed/components';
+import { Button, Input, Select } from '@kubed/components';
 
-import TagInput from '../TagInput';
+// import TagInput from '../TagInput';
 import type { ConditionItem } from './condition-edit';
 
 type Props = {
@@ -15,7 +15,7 @@ function ConditionSelect({ item, handleDelete }: Props): JSX.Element {
 
   function handleKeyChange(): void {}
 
-  function handleValueChange(): void {}
+  // function handleValueChange(): void {}
 
   function handleOperatorChange(): void {}
 
@@ -40,12 +40,13 @@ function ConditionSelect({ item, handleDelete }: Props): JSX.Element {
     }
 
     return (
-      <TagInput
-        name="values"
-        placeholder={t('VALUES')}
-        value={values}
-        onChange={handleValueChange}
-      />
+      // <TagInput
+      //   name="values"
+      //   placeholder={t('VALUES')}
+      //   value={values}
+      //   onChange={handleValueChange}
+      // />
+      <Input />
     );
   }
 

@@ -51,7 +51,10 @@ export const CssContainer = styled.div`
     align-items: center;
 
     .selectWrapper {
+      margin-right: 16px;
       flex: 1;
+      display: flex;
+      gap: 16px;
     }
   }
 `;

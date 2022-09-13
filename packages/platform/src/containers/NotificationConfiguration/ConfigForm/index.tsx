@@ -5,10 +5,10 @@ import { Form, Button } from '@kubed/components';
 
 import FooterBtn from './components/footer';
 import type { NavItem } from '../../../types';
-import { customMerge, initNotificationConfigStore } from './utils';
 import EnableService from './components/enable-service';
+import { customMerge, initNotificationConfigStore } from './utils';
 
-import Email, { initMail } from './Email';
+import Email from './Email';
 import WeCom from './WeCom';
 import Slack from './Slack';
 import FeiShu from './FeiShu';
@@ -38,10 +38,7 @@ function ConfigForm({ currentTab, tabs }: Props): JSX.Element {
     }
     return currentTab === 'mail' ? 'email' : currentTab;
   }, [currentTab]);
-  const [store, setStore] = useStore<Record<string, any>>('NotificationConfigStore', {
-    ...initNotificationConfigStore(tabs),
-    email: initMail,
-  });
+  const [store, setStore] = useStore<Record<string, any>>('NotificationConfigStore', initNotificationConfigStore(tabs));
   const currentFormData = useMemo(() => {
     return store[tabType];
   }, [store]);
