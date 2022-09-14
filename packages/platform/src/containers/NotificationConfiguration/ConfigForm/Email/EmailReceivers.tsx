@@ -5,7 +5,7 @@ import { notify } from '@kubed/components';
 import { Pattern } from '@ks-console/shared';
 
 import List from '../components/List';
-import BoxInput from '../components/box-input';
+import BoxInput from '../components/BoxInput';
 import type { ListItem } from '../../../../types';
 
 type Props = {

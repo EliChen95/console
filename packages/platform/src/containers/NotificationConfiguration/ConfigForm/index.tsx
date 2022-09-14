@@ -3,9 +3,9 @@ import { useStore } from '@kubed/stook';
 import { cloneDeep, mergeWith } from 'lodash';
 import { Form, Button } from '@kubed/components';
 
-import FooterBtn from './components/footer';
+import FooterBtn from './components/FooterBtn';
 import type { NavItem } from '../../../types';
-import EnableService from './components/enable-service';
+import EnableService from './components/EnableService';
 import { customMerge, initNotificationConfigStore } from './utils';
 
 import Email from './Email';
@@ -38,7 +38,10 @@ function ConfigForm({ currentTab, tabs }: Props): JSX.Element {
     }
     return currentTab === 'mail' ? 'email' : currentTab;
   }, [currentTab]);
-  const [store, setStore] = useStore<Record<string, any>>('NotificationConfigStore', initNotificationConfigStore(tabs));
+  const [store, setStore] = useStore<Record<string, any>>(
+    'NotificationConfigStore',
+    initNotificationConfigStore(tabs),
+  );
   const currentFormData = useMemo(() => {
     return store[tabType];
   }, [store]);
@@ -49,21 +52,22 @@ function ConfigForm({ currentTab, tabs }: Props): JSX.Element {
   }
 
   function handleVerify(): void {
-    console.log('should verify form data');
+    // todo: verify form data
   }
 
   function handleSubmit(): void {
+    // todo: submit form data
     console.log('form submit', store[tabType]);
   }
 
   function onCancel(): void {
+    //todo: cancel form change
     console.log('form change cancel');
   }
 
   useEffect(() => {
     // todo fetch data
     // loading = true
-    // console.log(`should fetch ${tabType} data`, store[tabType]);
     // loading = false
     // todo merge response data to currentFormData
     // const newData = cloneDeep(store)

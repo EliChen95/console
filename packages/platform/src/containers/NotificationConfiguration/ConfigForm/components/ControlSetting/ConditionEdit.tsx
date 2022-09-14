@@ -2,7 +2,7 @@ import React from 'react';
 import cx from 'classnames';
 import { Button } from '@kubed/components';
 
-import ConditionSelect from './condition-select';
+import ConditionSelect from './ConditionSelect';
 
 export type ConditionItem = {
   key?: string;
@@ -19,10 +19,12 @@ type Props = {
 
 function ArrayInput({ desc, addText, className, conditions }: Props): JSX.Element {
   function handleAdd(): void {
+    // todo: add condition
     console.log('add condition');
   }
 
   function handleDelete(): void {
+    // todo: delete condition
     console.log('delete condition');
   }
 

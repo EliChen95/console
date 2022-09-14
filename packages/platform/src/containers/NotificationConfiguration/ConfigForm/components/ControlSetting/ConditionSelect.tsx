@@ -3,7 +3,7 @@ import { Icon } from '@ks-console/shared';
 import { Button, Input, Select } from '@kubed/components';
 
 // import TagInput from '../TagInput';
-import type { ConditionItem } from './condition-edit';
+import type { ConditionItem } from './ConditionEdit';
 
 type Props = {
   item: ConditionItem;

@@ -4,7 +4,7 @@ import { useStore } from '@kubed/stook';
 import { Icon } from '@ks-console/shared';
 import { Checkbox, Field, FormItem } from '@kubed/components';
 
-import ConditionEdit from './condition-edit';
+import ConditionEdit from './ConditionEdit';
 
 import { CssContainer } from './styles';
 

@@ -1,6 +1,6 @@
 import React from 'react';
 
-import Item from './list-item';
+import Item from './ListItem';
 import type { ListItem } from '../../../../../types';
 
 import { CssContainer } from '../styles';

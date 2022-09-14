@@ -4,9 +4,9 @@ import { useStore } from '@kubed/stook';
 import { Pattern } from '@ks-console/shared';
 import { Text, Input, FormItem, InputPassword } from '@kubed/components';
 
-import RequireTLS from './require-tsl';
-import EmailReceivers from './email-receivers';
-import UrlInput from '../components/url-input';
+import RequireTLS from './RequireTsl';
+import EmailReceivers from './EmailReceivers';
+import UrlInput from '../components/UrlInput';
 
 import { CssContainer } from './styles';
 
