@@ -3,7 +3,7 @@ import { useUrl, useList, getOriginData, getRoleBaseInfo, parser } from '@ks-con
 import type { UseListOptions } from '@ks-console/shared';
 
 import type { GetPathParams } from '../../types';
-import type { OriginalRole, FormatRoleKind } from './types';
+import type { OriginalRole, FormatRoleKind } from '../../types/role';
 
 const module = 'globalroles';
 
@@ -15,7 +15,7 @@ function getResourceUrl(params?: GetPathParams) {
 
 function formatRole(item: OriginalRole, kind: FormatRoleKind) {
   return {
-    ...getRoleBaseInfo(item, kind),
+    ...getRoleBaseInfo<OriginalRole>(item, kind),
     labels: get(item, 'metadata.labels', {}),
     namespace: get(item, 'metadata.namespace'),
     annotations: get(item, 'metadata.annotations'),
@@ -28,7 +28,7 @@ function formatRole(item: OriginalRole, kind: FormatRoleKind) {
       [],
     ),
     rules: get(item, 'rules'),
-    _originData: getOriginData(item),
+    _originData: getOriginData<OriginalRole>(item),
   };
 }
 
@@ -43,12 +43,14 @@ function useRoles(options?: Omit<UseListOptions<OriginalRole>, 'url'>) {
     {
       url,
       params,
-      format: (item: OriginalRole) => formatRole(item, module),
     },
     options,
   );
+  const result = useList(opts);
+  const roles = result?.data ?? [];
+  const formattedRoles = roles.map(role => formatRole(role, module));
 
-  return useList(opts);
+  return { ...result, formattedRoles };
 }
 
 export { getResourceUrl, formatRole, useRoles };

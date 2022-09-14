@@ -10,8 +10,7 @@ import {
   notify,
 } from '@kubed/components';
 import { useStore } from '@kubed/stook';
-import { Pattern } from '@ks-console/shared';
-import PasswordTip from '../../../../components/PasswordTip';
+import { Pattern, PasswordTip } from '@ks-console/shared';
 import { useModifyPassword } from '../../../../stores/user';
 
 interface WrapperProps {

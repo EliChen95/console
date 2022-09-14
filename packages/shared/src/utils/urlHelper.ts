@@ -64,3 +64,10 @@ export const getClusterUrl = (url: string): string => {
 
   return requestURL.replace(/\/\/+/, '/');
 };
+
+export const getWebSocketProtocol = (protocol: string) => {
+  if (protocol.startsWith('https')) {
+    return 'wss';
+  }
+  return 'ws';
+};

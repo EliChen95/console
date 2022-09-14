@@ -1,6 +1,4 @@
 import React, {
-  PropsWithChildren,
-  ReactElement,
   useMemo,
   useReducer,
   useEffect,
@@ -8,6 +6,7 @@ import React, {
   useImperativeHandle,
   forwardRef,
 } from 'react';
+import type { PropsWithChildren, ReactElement, ReactNode } from 'react';
 import {
   useTable,
   useFilters,
@@ -36,6 +35,7 @@ import {
   getInitialState,
   useDidUpdate,
 } from './utils';
+import type { TableRef } from './utils';
 import {
   PAGE_CHANGED,
   SORTBY_CHANGED,
@@ -44,7 +44,7 @@ import {
   TOTAL_COUNT_CHANGED,
 } from './reducer';
 
-export type { Column, TableProps };
+export type { Column, TableProps, TableRef };
 
 const selectionHook = (hooks: Hooks<any>) => {
   hooks.getToggleAllRowsSelectedProps = [
@@ -102,7 +102,33 @@ const selectionHook = (hooks: Hooks<any>) => {
 const hooks = [useFilters, useSortBy, usePagination, useRowSelect];
 const withSelectionHooks = [...hooks, selectionHook];
 
-function DataTableComponent<T extends Record<string, any>>(
+function hasContent(value: ReactNode) {
+  if (value === undefined || value === null) {
+    return false;
+  }
+
+  const type = typeof value;
+
+  if (type === 'boolean') {
+    return false;
+  }
+
+  if (type === 'number') {
+    return true;
+  }
+
+  if (typeof value === 'string') {
+    return !!value.trim();
+  }
+
+  if (Array.isArray(value)) {
+    return value.length > 0;
+  }
+
+  return true;
+}
+
+function DataTableComponent<T extends Record<string, any> = Record<string, any>>(
   props: PropsWithChildren<TableProps<T>>,
   ref: React.Ref<unknown> | undefined,
 ): ReactElement {
@@ -119,13 +145,14 @@ function DataTableComponent<T extends Record<string, any>>(
     toolbarRight,
     rowKey,
     placeholder,
-    selectType = 'checkbox',
+    selectType = hasContent(batchActions) ? 'checkbox' : false,
     url,
     emptyPlaceholder,
     tableName,
     useStorageState,
     format,
     disableRowSelect,
+    onSelect,
   } = props;
   const [, setStorageState] = useLocalStorage({ key: `tableState:${tableName}` });
   const initialState = getInitialState(tableName, useStorageState);
@@ -219,14 +246,18 @@ function DataTableComponent<T extends Record<string, any>>(
     dispatch({ type: TOTAL_COUNT_CHANGED, payload: serverData?.totalItems });
   }, [serverData?.totalItems]);
 
-  const tableRef = useRef();
+  // TODO: onSelect has a bug, need Improvement
+  useEffect(() => {
+    onSelect?.(state.selectedRowIds ?? {}, selectedFlatRows?.map(d => d.original) ?? []);
+  }, [state.selectedRowIds]);
+
+  const tableRef = useRef<TableRef<T>>();
 
   useImperativeHandle(ref, () => ({
-    refetch: () => {
-      refetch();
-    },
-    getSelectedRowIds: () => debouncedState?.selectedRowIds || {},
-    getSelectedFlatRows: () => selectedFlatRows?.map(d => d.original) || [],
+    instance,
+    refetch,
+    getSelectedRowIds: () => debouncedState?.selectedRowIds ?? {},
+    getSelectedFlatRows: () => selectedFlatRows?.map(d => d.original) ?? [],
   }));
 
   return (

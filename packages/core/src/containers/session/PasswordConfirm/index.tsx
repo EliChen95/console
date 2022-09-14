@@ -3,8 +3,7 @@ import { useMutation } from 'react-query';
 import { useNavigate } from 'react-router-dom';
 import { get } from 'lodash';
 import { Button, Card, Form, FormItem, InputPassword, Alert } from '@kubed/components';
-import { request, Pattern } from '@ks-console/shared';
-import PasswordTip from '../../../components/PasswordTip';
+import { request, Pattern, PasswordTip } from '@ks-console/shared';
 
 import {
   LoginHeader,

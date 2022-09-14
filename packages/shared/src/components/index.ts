@@ -6,3 +6,4 @@ export * from './CodeEditor';
 export { default as CodeViewer } from './CodeViewer';
 export { default as StatusIndicator } from './StatusIndicator';
 export * from './DeleteConfirmModal';
+export { default as PasswordTip } from './PasswordTip';

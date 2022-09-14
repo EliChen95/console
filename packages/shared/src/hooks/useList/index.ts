@@ -3,13 +3,20 @@ import { useQuery } from 'react-query';
 import request from '../../utils/request';
 import type { UseListInstance, UseListOptions, UseListState } from './types';
 
-const useData = (
+interface ListData<T> {
+  items: T[];
+  totalItems?: number;
+  total_count?: number;
+  length?: number;
+}
+
+const useData = <TQueryFnData>(
   url: string,
   params: Record<string, any> = {},
   autoFetch: boolean = true,
   callback?: (data: any) => any,
 ) => {
-  return useQuery(
+  return useQuery<TQueryFnData>(
     // @ts-ignore
     ['useList', url, params],
     async () => {
@@ -45,7 +52,7 @@ export function useList<T>(options: UseListOptions<T>): UseListInstance<T> {
     params: options.params,
   });
 
-  const { data, isFetching, isSuccess, refetch } = useData(
+  const { data, isFetching, isSuccess, refetch } = useData<ListData<T>>(
     options.url,
     {
       ...state.params,
@@ -56,8 +63,9 @@ export function useList<T>(options: UseListOptions<T>): UseListInstance<T> {
 
   useEffect(() => {
     if (isSuccess) {
-      const totalCount = data?.totalItems || data?.total_count || data?.length;
-      const items = options.format ? formatData(data?.items, options.format) : data?.items;
+      const totalCount = (data?.totalItems || data?.total_count || data?.length)!;
+      const originalItems = data?.items ?? [];
+      const items = options.format ? formatData(originalItems, options.format) : originalItems;
       if (mode === 'page') {
         setState({
           ...state,

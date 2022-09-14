@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from 'react';
-import { Column as TableColumn, TableState } from 'react-table';
+import type { Column as TableColumn, TableState, TableInstance } from 'react-table';
 import { useQuery } from 'react-query';
 import { useLocalStorage } from '@kubed/hooks';
 import { Suggestions } from './Toolbar';
@@ -34,7 +34,7 @@ interface RequiredRenderColumn {
 
 export type Column = BaseColumn & (RequiredFieldColumn | RequiredRenderColumn);
 
-export interface TableProps<T extends Record<string, any>> {
+export interface TableProps<T extends Record<string, any> = Record<string, any>> {
   columns: Column[];
   tableName: string;
   rowKey: string;
@@ -54,7 +54,7 @@ export interface TableProps<T extends Record<string, any>> {
   url?: string;
   fetchCallback?: (data: Array<T>) => any;
   batchActions?: React.ReactNode;
-  onSelect?: (selectedRowKeys?: string[], selectedRows?: Array<T>) => any;
+  onSelect?: (selectedRowIds: Record<string, boolean>, selectedFlatRows: T[]) => any;
   disableRowSelect?: (row?: Record<string, any>) => boolean;
   onFilter?: () => any;
   onSort?: () => any;
@@ -66,7 +66,8 @@ export interface TableProps<T extends Record<string, any>> {
   toolbarRight?: React.ReactNode;
 }
 
-export interface TableRef<T> {
+export interface TableRef<T extends Record<string, any> = Record<string, any>> {
+  instance: TableInstance<T>;
   refetch: () => void;
   getSelectedRowIds: () => Record<string, boolean>;
   getSelectedFlatRows: () => T[];

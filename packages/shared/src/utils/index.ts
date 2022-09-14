@@ -18,3 +18,4 @@ export * from './formatter';
 export * from './nav';
 export * from './checker';
 export * from './string';
+export * from './websocket.client';

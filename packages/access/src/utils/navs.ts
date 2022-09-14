@@ -8,7 +8,8 @@ export function getAccessNavs() {
     return checkNavItem(item, params => hasPermission({ ...params }));
   });
   if (!isEmpty(filteredItems)) {
-    navs.push({ ...accessNavs, items: filteredItems });
+    navs.push({ ...accessNavs, children: filteredItems });
   }
+
   return navs;
 }
