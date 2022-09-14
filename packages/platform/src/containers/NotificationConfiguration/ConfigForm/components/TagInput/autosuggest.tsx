@@ -11,7 +11,7 @@ type Props = {
   onChange?: (e: React.ChangeEvent<HTMLInputElement>, val: any) => void;
 };
 
-function Autosuggest({ placeholder, onChange, onAdd, onDelete, style }: Props, ref: any) {
+function Autosuggest({ placeholder, onChange, onAdd, onDelete, style }: Props) {
   const [value, setValue] = useState<any>();
   const inputBoxRef = useRef<any>();
 

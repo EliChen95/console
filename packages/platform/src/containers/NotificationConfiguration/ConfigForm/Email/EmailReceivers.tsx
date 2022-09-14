@@ -31,11 +31,11 @@ function EmailReceivers({ onChange }: Props): JSX.Element {
       notify.error(t('EMAIL_EMPTY_DESC'), { duration: 6000 });
       return false;
     }
-    if ([].length > count - 1) {
+    if (values.length > count - 1) {
       notify.error(t.html('MAX_EAMIL_COUNT', { count }), { duration: 1000 });
       return false;
     }
-    if ([].some(item => item === email)) {
+    if (values.some(item => item === email)) {
       notify.error(t('EMAIL_EXISTS'), { duration: 1000 });
       return false;
     }

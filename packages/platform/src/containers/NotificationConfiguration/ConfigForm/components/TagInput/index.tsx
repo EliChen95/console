@@ -20,7 +20,7 @@ import React, { useRef, useState } from 'react';
 import { Tag } from '@kubed/components';
 import { Icon } from '@ks-console/shared';
 
-import Autosuggest from './autosuggest';
+import Autosuggest from './Autosuggest';
 
 import { CssContainer } from './styles';
 
@@ -78,11 +78,11 @@ function TagInput({ placeholder, onInputChange, onChange }: Props): JSX.Element 
           <Tag key={`${item}-${index + 1}`}>
             {item}
             <Icon
-              name="close"
-              // color={{ primary: 'rgb(255,255,255)' }}
-              size={16}
               // clickable
+              // color={{ primary: 'rgb(255,255,255)' }}
               // onClick={() => handleCloseTag({ item, index })}
+              name="close"
+              size={16}
             ></Icon>
           </Tag>
         ))}
@@ -94,13 +94,7 @@ function TagInput({ placeholder, onInputChange, onChange }: Props): JSX.Element 
     <CssContainer>
       <div className="input filter-input" onClick={handleClick}>
         {renderTags()}
-        <Autosuggest
-          ref={ref}
-          placeholder={placeholder}
-          onChange={handleInputChange}
-          onAdd={handleAdd}
-          // onDelte={handleDelete}
-        />
+        <Autosuggest placeholder={placeholder} onChange={handleInputChange} onAdd={handleAdd} />
       </div>
     </CssContainer>
   );
