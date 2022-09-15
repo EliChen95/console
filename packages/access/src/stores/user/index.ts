@@ -1,7 +1,7 @@
 import { get, noop, merge } from 'lodash';
 import { useMutation } from 'react-query';
 import { notify } from '@kubed/components';
-import { useUrl, getBaseInfo, getOriginData, request, cookie } from '@ks-console/shared';
+import { useUrl, getBaseInfo, getOriginData, request, cookie, useList } from '@ks-console/shared';
 
 import type { GetPathParams } from '../../types';
 import type {
@@ -175,4 +175,23 @@ export function useUsersDeleteMutation(options?: { onSuccess?: () => void }) {
     },
     { onSuccess },
   );
+}
+
+export function useUsers(options?: any) {
+  // TODO: missing params ?
+  const url = getResourceUrl();
+  const params = {
+    annotation: 'kubesphere.io/creator',
+  };
+  const opts = merge(
+    {},
+    {
+      url,
+      params,
+      format: (item: any) => formatUser(item),
+    },
+    options,
+  );
+
+  return useList<any>(opts);
 }

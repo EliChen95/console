@@ -4,9 +4,16 @@ import { Information, Success, Error } from '@kubed/icons';
 import { Text, Popover } from '@kubed/components';
 import { get } from 'lodash';
 
-const Wrapper = styled.span``;
+const Wrapper = styled.span`
+  display: flex;
+  align-items: center;
+`;
 
 const Conditions = styled.div``;
+
+const TextWrapper = styled(Text)`
+  margin-left: 4px;
+`;
 
 interface StatusReasonProps {
   data: any;
@@ -50,7 +57,7 @@ const StatusReason = ({ data, hasTip }: StatusReasonProps) => {
       ) : (
         icon
       )}
-      <Text color="warning">{t('Not Ready')}</Text>
+      <TextWrapper color="warning">{t('Not Ready')}</TextWrapper>
     </Wrapper>
   );
 };
