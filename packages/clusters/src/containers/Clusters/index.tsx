@@ -38,10 +38,13 @@ const Clusters = () => {
     data: hostData = [],
     refresh: hostRefresh,
     reFetch: hostReFetch,
-  } = fetchList({
-    labelSelector: 'cluster-role.kubesphere.io/host=',
-    limit: -1,
-  });
+  } = fetchList(
+    {
+      labelSelector: 'cluster-role.kubesphere.io/host=',
+      limit: -1,
+    },
+    true,
+  );
 
   const {
     isLoading,

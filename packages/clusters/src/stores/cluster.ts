@@ -5,7 +5,6 @@ import {
   getOriginData,
   PathParams,
   isMultiCluster,
-  hasPermission,
   useUrl,
   useList,
 } from '@ks-console/shared';
@@ -34,7 +33,7 @@ export const clusterMapper = (item: any) => {
   };
 };
 
-const module = 'clusters';
+export const module = 'clusters';
 
 const { getResourceUrl, getPath } = useUrl({ module });
 
@@ -56,10 +55,10 @@ export const fetchDetail = async (params: PathParams) => {
 const getTenantUrl = (params = {}) =>
   `kapis/tenant.kubesphere.io/v1alpha2${getPath(params)}/${module}`;
 
-export const fetchList = (params: Record<string, any>, from?: string) => {
+export const fetchList = (params: Record<string, any>, isGranted?: boolean) => {
   if (!isMultiCluster()) {
     return {
-      data: [Constants.DEFAULT_CLUSTER],
+      data: [Constants.DEFAULT_CLUSTER].map(clusterMapper),
       isLoading: false,
       total: 1,
       refresh() {},
@@ -67,10 +66,7 @@ export const fetchList = (params: Record<string, any>, from?: string) => {
     };
   }
 
-  const url =
-    from === 'resource' || hasPermission({ module: 'clusters', action: 'view' })
-      ? getResourceUrl()
-      : getTenantUrl();
+  const url = !isGranted ? getResourceUrl() : getTenantUrl();
 
   return useList({ url, params, format: clusterMapper });
 };

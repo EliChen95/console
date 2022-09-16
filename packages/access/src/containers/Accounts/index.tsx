@@ -6,10 +6,16 @@ import { noop } from 'lodash';
 import { Banner, Field, notify } from '@kubed/components';
 import { Human, Pen, Stop, Start, Trash } from '@kubed/icons';
 import type { Column, TableRef, DeleteConfirmModalProps } from '@ks-console/shared';
-import { DataTable, formatTime, StatusIndicator, DeleteConfirmModal } from '@ks-console/shared';
-
+import {
+  DataTable,
+  formatTime,
+  StatusIndicator,
+  DeleteConfirmModal,
+  useBatchActions,
+  useItemActions,
+  useTableActions,
+} from '@ks-console/shared';
 import type { OriginalUser, FormattedUser, UserStatusMutationType } from '../../types/user';
-import { useAction } from '../../hooks/useAction';
 import {
   module,
   getResourceUrl,
@@ -70,9 +76,45 @@ export default function Accounts() {
     onSuccess: onDeleteSuccess,
   });
 
-  const { renderTableAction, renderItemAction, renderBatchAction } = useAction({
+  const renderBatchAction = useBatchActions({
     authKey: module,
-    itemAction: [
+    actions: [
+      {
+        key: 'delete',
+        action: 'delete',
+        text: t('DELETE'),
+        props: {
+          color: 'error',
+        },
+        onClick: () => {
+          const items = tableRef.current?.getSelectedFlatRows();
+          if (items) {
+            const usernames = items.map(({ username }) => username);
+            setResource(usernames);
+            setUserDeleteModalVisible(true);
+          }
+        },
+      },
+      {
+        key: 'active',
+        action: 'edit',
+        text: t('ENABLE'),
+        // TODO: batch button disabled
+        // disabled: () => selectedFlatRows.every(item => item.status === 'Active'),
+        onClick: () => handleUsersStatus('active'),
+      },
+      {
+        key: 'disabled',
+        action: 'edit',
+        text: t('DISABLE'),
+        // disabled: () => selectedFlatRows.every(item => item.status === 'Disabled'),
+        onClick: () => handleUsersStatus('disabled'),
+      },
+    ],
+  });
+  const renderItemAction = useItemActions({
+    authKey: module,
+    actions: [
       {
         key: 'edit',
         action: 'edit',
@@ -107,7 +149,10 @@ export default function Accounts() {
         },
       },
     ],
-    tableAction: [
+  });
+  const renderTableAction = useTableActions({
+    authKey: module,
+    actions: [
       {
         key: 'create',
         action: 'create',
@@ -117,39 +162,6 @@ export default function Accounts() {
           shadow: true,
         },
         onClick: () => setUserCreateModalVisible(true),
-      },
-    ],
-    batchAction: [
-      {
-        key: 'delete',
-        action: 'delete',
-        text: t('DELETE'),
-        props: {
-          color: 'error',
-        },
-        onClick: () => {
-          const items = tableRef.current?.getSelectedFlatRows();
-          if (items) {
-            const usernames = items.map(({ username }) => username);
-            setResource(usernames);
-            setUserDeleteModalVisible(true);
-          }
-        },
-      },
-      {
-        key: 'active',
-        action: 'edit',
-        text: t('ENABLE'),
-        // TODO: batch button disabled
-        // disabled: () => selectedFlatRows.every(item => item.status === 'Active'),
-        onClick: () => handleUsersStatus('active'),
-      },
-      {
-        key: 'disabled',
-        action: 'edit',
-        text: t('DISABLE'),
-        // disabled: () => selectedFlatRows.every(item => item.status === 'Disabled'),
-        onClick: () => handleUsersStatus('disabled'),
       },
     ],
   });
