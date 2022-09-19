@@ -1,17 +1,18 @@
 import React from 'react';
-import cx from 'classnames';
 import { Button } from '@kubed/components';
 
 import ConditionSelect from './ConditionSelect';
 
-export type ConditionItem = {
+import { Wrapper, Footer } from './styles';
+
+export type Condition = {
   key?: string;
   operator?: string;
   values?: string[];
 };
 
 type Props = {
-  conditions?: Array<ConditionItem>;
+  conditions?: Array<Condition>;
   desc?: React.ReactNode;
   addText?: string;
   className?: string;
@@ -29,17 +30,17 @@ function ArrayInput({ desc, addText, className, conditions }: Props): JSX.Elemen
   }
 
   return (
-    <div className={cx('wrapper', className)}>
+    <Wrapper className={className}>
       {conditions?.map((item, index) => {
         return <ConditionSelect item={item} handleDelete={handleDelete} key={index} />;
       })}
-      <div className="footer">
+      <Footer>
         {desc}
         <Button className="add" onClick={handleAdd}>
           {addText}
         </Button>
-      </div>
-    </div>
+      </Footer>
+    </Wrapper>
   );
 }
 

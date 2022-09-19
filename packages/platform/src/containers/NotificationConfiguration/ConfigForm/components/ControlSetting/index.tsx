@@ -6,7 +6,7 @@ import { Checkbox, Field, FormItem } from '@kubed/components';
 
 import ConditionEdit from './ConditionEdit';
 
-import { CssContainer } from './styles';
+import { Desc, Annotation } from './styles';
 
 type Props = {
   id: string;
@@ -41,7 +41,7 @@ function ControlSetting({ id, name }: Props): JSX.Element {
   }, [id]);
 
   return (
-    <CssContainer className="items">
+    <div className="items">
       <Field
         avatar={<Checkbox checked={checked} onChange={handleChange} />}
         label={t('NOTIFICATION_CONDITION_SETTINGS_DESC')}
@@ -53,15 +53,15 @@ function ControlSetting({ id, name }: Props): JSX.Element {
             conditions={get(store[id], name.join('.'), [''])}
             addText={t('ADD')}
             desc={
-              <div className="annotation">
+              <Annotation>
                 <Icon name="question" />
-                <p className="desc">{t('NOTIFICATION_CONDITION_SETTING_TIP')}</p>
-              </div>
+                <Desc>{t('NOTIFICATION_CONDITION_SETTING_TIP')}</Desc>
+              </Annotation>
             }
           />
         </FormItem>
       )}
-    </CssContainer>
+    </div>
   );
 }
 

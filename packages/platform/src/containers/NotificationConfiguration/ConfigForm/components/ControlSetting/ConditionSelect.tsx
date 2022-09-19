@@ -3,10 +3,12 @@ import { Icon } from '@ks-console/shared';
 import { Button, Input, Select } from '@kubed/components';
 
 // import TagInput from '../TagInput';
-import type { ConditionItem } from './ConditionEdit';
+import type { Condition } from './ConditionEdit';
+
+import { ErrorText, ConditionItem } from './styles';
 
 type Props = {
-  item: ConditionItem;
+  item: Condition;
   handleDelete: () => void;
 };
 
@@ -52,7 +54,7 @@ function ConditionSelect({ item, handleDelete }: Props): JSX.Element {
 
   return (
     <>
-      <div className="condition-item">
+      <ConditionItem>
         <div className="selectWrapper">
           <Select
             name="key"
@@ -73,8 +75,8 @@ function ConditionSelect({ item, handleDelete }: Props): JSX.Element {
         <Button className="delete" onClick={handleDelete}>
           <Icon name="trash" />
         </Button>
-      </div>
-      {keyErrorTip !== '' && <div className="errorText">{keyErrorTip}</div>}
+      </ConditionItem>
+      {keyErrorTip !== '' && <ErrorText>{keyErrorTip}</ErrorText>}
     </>
   );
 }
