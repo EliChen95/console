@@ -3,9 +3,11 @@ import { useStore } from '@kubed/stook';
 import { cloneDeep, mergeWith } from 'lodash';
 import { Form, Button } from '@kubed/components';
 
-import FooterBtn from './components/FooterBtn';
+import type { BaseTemplate } from './types';
 import type { NavItem } from '../../../types';
+import FooterBtn from './components/FooterBtn';
 import EnableService from './components/EnableService';
+import ControlSetting from './components/ControlSetting';
 import { customMerge, initNotificationConfigStore } from './utils';
 
 import Email from './Email';
@@ -14,7 +16,6 @@ import Slack from './Slack';
 import FeiShu from './FeiShu';
 import Webhook from './Webhook';
 import DingTalk from './DingTalk';
-import ControlSetting from './components/ControlSetting';
 
 import { Block, HorizonBlock } from './styles';
 
@@ -28,8 +29,8 @@ const FORM_MAP: Record<string, ReactNode> = {
 };
 
 type Props = {
-  currentTab: string;
   tabs: NavItem[];
+  currentTab: string;
 };
 
 function ConfigForm({ currentTab, tabs }: Props): JSX.Element {
@@ -40,7 +41,7 @@ function ConfigForm({ currentTab, tabs }: Props): JSX.Element {
     }
     return currentTab === 'mail' ? 'email' : currentTab;
   }, [currentTab]);
-  const [store, setStore] = useStore<Record<string, any>>(
+  const [store, setStore] = useStore<Record<string, BaseTemplate>>(
     'NotificationConfigStore',
     initNotificationConfigStore(tabs),
   );
@@ -48,9 +49,14 @@ function ConfigForm({ currentTab, tabs }: Props): JSX.Element {
     return store[tabType];
   }, [store]);
 
-  function onValuesChange(data: any, values: Record<string, any>): void {
+  function onValuesChange(
+    data: Record<string, unknown>,
+    values: Record<string, BaseTemplate>,
+  ): void {
     const formData = cloneDeep(store);
-    setStore(mergeWith(formData, { [tabType]: values }, customMerge));
+    const mergedData = mergeWith(formData, { [tabType]: values }, customMerge);
+    console.log(mergedData);
+    setStore(mergedData);
   }
 
   function handleVerify(): void {

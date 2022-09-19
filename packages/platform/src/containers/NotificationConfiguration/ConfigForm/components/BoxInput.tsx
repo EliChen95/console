@@ -8,7 +8,7 @@ type Props = {
   title?: string;
   className?: string;
   defaultSelectValue?: string;
-  onAdd?: (item: string) => any;
+  onAdd?: (item: string) => void;
   onChange?: (value: string) => void;
   validate?: (value: string) => void;
   onSelectChange?: (key: string) => void;

@@ -1,8 +1,9 @@
 import { isArray } from 'lodash';
 
-import { NavItem } from '../../../types';
+import type { NavItem } from '../../../types';
+import type { BaseTemplate, BaseTemplateParam, ReceiverTemplateParam } from './types';
 
-export const getNotificationConfigTemplate = ({ name }: any) => ({
+export const getNotificationConfigTemplate = ({ name }: BaseTemplateParam): BaseTemplate => ({
   apiVersion: 'notification.kubesphere.io/v2beta2',
   kind: 'Config',
   metadata: {
@@ -11,7 +12,10 @@ export const getNotificationConfigTemplate = ({ name }: any) => ({
   spec: {},
 });
 
-export const getNotificationReceiverTemplate = ({ name, type }: any) => ({
+export const getNotificationReceiverTemplate = ({
+  name,
+  type,
+}: ReceiverTemplateParam): BaseTemplate => ({
   apiVersion: 'notification.kubesphere.io/v2beta2',
   kind: 'Receiver',
   metadata: {
@@ -24,7 +28,7 @@ export const getNotificationReceiverTemplate = ({ name, type }: any) => ({
   },
 });
 
-export const getGlobalSecretTemplate = ({ name }: any) => ({
+export const getGlobalSecretTemplate = ({ name }: BaseTemplateParam): BaseTemplate => ({
   apiVersion: 'v1',
   kind: 'Secret',
   metadata: {
@@ -33,7 +37,7 @@ export const getGlobalSecretTemplate = ({ name }: any) => ({
   type: 'Opaque',
 });
 
-export function getInitFormDataByTab(tab: string): Record<string, any> {
+export function getInitFormDataByTab(tab: string): Record<string, BaseTemplate> {
   return {
     config: getNotificationConfigTemplate({
       name: `default-${tab}-config`,
@@ -48,13 +52,7 @@ export function getInitFormDataByTab(tab: string): Record<string, any> {
   };
 }
 
-export const DEFAULT_FORM_DATA = {
-  notificationconfigs: getNotificationConfigTemplate,
-  notificationreceivers: getNotificationReceiverTemplate,
-  globalsecret: getGlobalSecretTemplate,
-};
-
-export function initNotificationConfigStore(tabs: NavItem[]): Record<string, any> {
+export function initNotificationConfigStore(tabs: NavItem[]): Record<string, BaseTemplate> {
   return tabs.reduce((acc, { name }: NavItem) => {
     const key = name === 'mail' ? 'email' : name;
     acc[key] = getInitFormDataByTab(key);
@@ -62,7 +60,7 @@ export function initNotificationConfigStore(tabs: NavItem[]): Record<string, any
   }, {} as Record<string, any>);
 }
 
-export function customMerge(objValue: Record<string, any>, srcValue: Record<string, any>): any {
+export function customMerge(objValue: unknown, srcValue: unknown): unknown {
   if (isArray(objValue)) {
     return srcValue;
   }

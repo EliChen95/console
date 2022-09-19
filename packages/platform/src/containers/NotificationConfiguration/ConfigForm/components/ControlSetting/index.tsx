@@ -2,8 +2,10 @@ import React, { ChangeEvent, useEffect, useState } from 'react';
 import { get } from 'lodash';
 import { useStore } from '@kubed/stook';
 import { Icon } from '@ks-console/shared';
+import { RuleObject } from 'rc-field-form/lib/interface';
 import { Checkbox, Field, FormItem } from '@kubed/components';
 
+import { Condition } from './types';
 import ConditionEditor from './ConditionEditor';
 
 import { Desc, Annotation } from './styles';
@@ -12,7 +14,6 @@ import { ItemWrapper } from '../../styles';
 type Props = {
   id: string;
   name: string[];
-  onChange?: (val: any) => void;
 };
 
 function ControlSetting({ id, name }: Props): JSX.Element {
@@ -23,16 +24,16 @@ function ControlSetting({ id, name }: Props): JSX.Element {
     setChecked(target.checked);
   }
 
-  function checkItemValid(item: any): boolean {
-    return item.key && item.operator;
+  function checkItemValid(item: Condition): boolean {
+    return !!item.key && !!item.operator;
   }
 
-  function itemValidator(rule: any, value: any, callback: any) {
+  function itemValidator(rule: RuleObject, value: Condition[], callback: (error?: string) => void) {
     if (!value) {
       return callback();
     }
-    if (value.some((item: any) => !checkItemValid(item))) {
-      return callback({ message: t('INVALID_NOTIFICATION_CONDITION') });
+    if (value.some((item: Condition) => !checkItemValid(item))) {
+      return callback({ message: t('INVALID_NOTIFICATION_CONDITION') } as any);
     }
     callback();
   }
@@ -49,6 +50,7 @@ function ControlSetting({ id, name }: Props): JSX.Element {
         value={t('NOTIFICATION_CONDITIONS')}
       />
       {checked && (
+        // todo check rules on submit
         <FormItem name={name} rules={[{ validator: itemValidator }]}>
           <ConditionEditor
             conditions={get(store[id], name.join('.'), [''])}

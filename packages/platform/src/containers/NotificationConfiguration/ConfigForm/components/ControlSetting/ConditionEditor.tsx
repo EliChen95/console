@@ -1,15 +1,10 @@
 import React, { ReactNode } from 'react';
 import { Button } from '@kubed/components';
 
+import type { Condition } from './types';
 import ConditionSelect from './ConditionSelect';
 
 import { ConditionEditorWrapper, ConditionsFooter } from './styles';
-
-export type Condition = {
-  key?: string;
-  operator?: string;
-  values?: string[];
-};
 
 type Props = {
   conditions: Condition[];

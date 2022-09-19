@@ -1,16 +1,17 @@
-import React from 'react';
+import React, { CSSProperties } from 'react';
 import cx from 'classnames';
 import { Row, Col, FormItem, Input } from '@kubed/components';
 
 import { UrlInputWrapper } from './styles';
+import { Rule } from 'rc-field-form/lib/interface';
 
 type Props = {
   hostName: string[];
   portName: string[];
-  hostRules?: any;
-  portRules?: any;
+  hostRules?: Rule[];
+  portRules?: Rule[];
   readonly?: boolean;
-  style?: any;
+  style?: CSSProperties;
   className?: string;
   defaultPort?: number;
 };

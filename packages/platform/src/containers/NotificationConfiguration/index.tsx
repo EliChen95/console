@@ -12,7 +12,7 @@ import { ConfigFormWrapper } from './styles';
 
 function NotificationConfiguration(): JSX.Element {
   const navigate = useNavigate();
-  const { tab = 'mail' } = useParams<any>();
+  const { tab = 'mail' } = useParams();
   const isLoading = false;
   const tabs: NavItem[] = getNotificationConfigurationTabs();
   const navs: LabelValue[] = tabs.map((item: NavItem) => ({
