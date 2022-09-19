@@ -2,7 +2,7 @@ export type Router = {
   index?: boolean;
   name?: string;
   path?: string;
-  children?: Array<Router>;
+  children?: Router[];
   element?: any;
 };
 
@@ -13,8 +13,8 @@ export type NavItem = {
   icon?: string;
   title?: string;
   authKey: string;
-  tabs?: Array<NavItem>;
-  children?: Array<NavItem>;
+  tabs?: NavItem[];
+  children?: NavItem[];
   [key: string]: any;
 };
 

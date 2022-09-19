@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { ChangeEvent, useEffect, useState } from 'react';
 import { get } from 'lodash';
 import { useStore } from '@kubed/stook';
 import { Icon } from '@ks-console/shared';
@@ -19,7 +19,7 @@ function ControlSetting({ id, name }: Props): JSX.Element {
   const [store] = useStore('NotificationConfigStore');
   const [checked, setChecked] = useState<boolean>(!!get(store[id], name.join('.')));
 
-  function handleChange({ target }: React.ChangeEvent<HTMLInputElement>): void {
+  function handleChange({ target }: ChangeEvent<HTMLInputElement>): void {
     setChecked(target.checked);
   }
 

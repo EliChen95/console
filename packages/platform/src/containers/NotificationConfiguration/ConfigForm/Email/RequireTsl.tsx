@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { ChangeEvent } from 'react';
 import { Checkbox } from '@kubed/components';
 
 type Props = {
@@ -7,7 +7,7 @@ type Props = {
 };
 
 function RequireTLS({ defaultChecked, onChange }: Props): JSX.Element {
-  function handleChange({ target }: React.ChangeEvent<HTMLInputElement>): void {
+  function handleChange({ target }: ChangeEvent<HTMLInputElement>): void {
     onChange?.(target.checked);
   }
 

@@ -2,7 +2,7 @@ import { get, cloneDeep } from 'lodash';
 
 import type { NavItem } from '../types';
 
-export function getPlatformSettingsNavs(): Array<NavItem> {
+export function getPlatformSettingsNavs(): NavItem[] {
   const platformSettingsNavs: NavItem = cloneDeep(globals.config.platformSettingsNavs);
 
   return [{ ...platformSettingsNavs }];
@@ -19,9 +19,9 @@ export function getNotificationManagementNav(): NavItem | undefined {
   return notificationManagementNavs;
 }
 
-export function getNotificationConfigurationTabs(): Array<NavItem> {
+export function getNotificationConfigurationTabs(): NavItem[] {
   const notificationManagementNav = getNotificationManagementNav();
-  const tabs: Array<NavItem> = get(notificationManagementNav ?? {}, 'children[0].tabs', []);
+  const tabs: NavItem[] = get(notificationManagementNav ?? {}, 'children[0].tabs', []);
 
   return tabs;
 }

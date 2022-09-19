@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { ChangeEvent, KeyboardEvent, useState } from 'react';
 import { trim } from 'lodash';
 import { Button, Input } from '@kubed/components';
 
@@ -23,11 +23,11 @@ function BoxInput({ title, className, validate, onAdd, onChange }: Props): JSX.E
     }
   }
 
-  function handleKeyUp(e: React.KeyboardEvent): void {
+  function handleKeyUp(e: KeyboardEvent): void {
     if (e.key === 'Enter') handleAdd();
   }
 
-  function handleInputChange({ target }: React.ChangeEvent<HTMLInputElement>): void {
+  function handleInputChange({ target }: ChangeEvent<HTMLInputElement>): void {
     if (target.value) {
       setInputValue(target.value);
       onChange?.(target.value);

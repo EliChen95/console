@@ -16,7 +16,7 @@
  * along with KubeSphere Console.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-import React, { useRef, useState } from 'react';
+import React, { ChangeEvent, useRef, useState } from 'react';
 import { Tag } from '@kubed/components';
 import { Icon } from '@ks-console/shared';
 
@@ -29,7 +29,7 @@ type Props = {
   value: any;
   placeholder: string;
   onChange?: (val: any) => void;
-  onInputChange?: (e: React.ChangeEvent<HTMLInputElement>, value: any) => void;
+  onInputChange?: (e: ChangeEvent<HTMLInputElement>, value: any) => void;
 };
 
 function TagInput({ placeholder, onInputChange, onChange }: Props): JSX.Element {
@@ -47,7 +47,7 @@ function TagInput({ placeholder, onInputChange, onChange }: Props): JSX.Element 
     ref.current.focus();
   }
 
-  function handleInputChange(event: React.ChangeEvent<HTMLInputElement>, value: any) {
+  function handleInputChange(event: ChangeEvent<HTMLInputElement>, value: any) {
     onInputChange?.(event, value);
   }
 
@@ -73,7 +73,7 @@ function TagInput({ placeholder, onInputChange, onChange }: Props): JSX.Element 
 
   function renderTags() {
     return (
-      <React.Fragment>
+      <>
         {tags.map((item: any, index: number) => (
           <Tag key={`${item}-${index + 1}`}>
             {item}
@@ -86,7 +86,7 @@ function TagInput({ placeholder, onInputChange, onChange }: Props): JSX.Element 
             ></Icon>
           </Tag>
         ))}
-      </React.Fragment>
+      </>
     );
   }
 

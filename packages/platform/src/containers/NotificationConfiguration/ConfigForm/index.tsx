@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo } from 'react';
+import React, { ReactNode, useEffect, useMemo } from 'react';
 import { useStore } from '@kubed/stook';
 import { cloneDeep, mergeWith } from 'lodash';
 import { Form, Button } from '@kubed/components';
@@ -18,7 +18,7 @@ import ControlSetting from './components/ControlSetting';
 
 import { Block, HorizonBlock } from './styles';
 
-const FORM_MAP: Record<string, React.ReactNode> = {
+const FORM_MAP: Record<string, ReactNode> = {
   email: <Email />,
   feishu: <FeiShu />,
   dingtalk: <DingTalk />,

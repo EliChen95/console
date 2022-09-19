@@ -1,14 +1,21 @@
-import React, { forwardRef, useRef, useState } from 'react';
+import React, {
+  ChangeEvent,
+  forwardRef,
+  KeyboardEvent,
+  StyleHTMLAttributes,
+  useRef,
+  useState,
+} from 'react';
 import { notify, Input } from '@kubed/components';
 
 import { PATTERN_TAG } from '../../../../../constants';
 
 type Props = {
   placeholder?: string;
-  style?: React.StyleHTMLAttributes<HTMLDivElement>;
+  style?: StyleHTMLAttributes<HTMLDivElement>;
   onAdd?: (val: any) => void;
   onDelete?: () => void;
-  onChange?: (e: React.ChangeEvent<HTMLInputElement>, val: any) => void;
+  onChange?: (e: ChangeEvent<HTMLInputElement>, val: any) => void;
 };
 
 function Autosuggest({ placeholder, onChange, onAdd, onDelete, style }: Props) {
@@ -19,12 +26,12 @@ function Autosuggest({ placeholder, onChange, onAdd, onDelete, style }: Props) {
   //   inputBoxRef.current.focus();
   // }
 
-  function handleChange(event: React.ChangeEvent<HTMLInputElement>): void {
+  function handleChange(event: ChangeEvent<HTMLInputElement>): void {
     setValue(event.target.value);
     onChange?.(event, value);
   }
 
-  function handlePressEnter(event: React.KeyboardEvent): void {
+  function handlePressEnter(event: KeyboardEvent): void {
     event.stopPropagation();
     event.preventDefault();
 

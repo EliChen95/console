@@ -16,7 +16,7 @@ export const ErrorText = styled.div`
   color: ${({ theme }) => theme.palette.colors.red[2]};
 `;
 
-export const Footer = styled.div`
+export const ConditionsFooter = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;

@@ -12,7 +12,7 @@ import NotificationConfiguration from '../containers/NotificationConfiguration';
 const navs = getPlatformSettingsNavs();
 const indexRoutePath = get(navs, '[0].children[0].name', '/404');
 
-const routes: Array<Router> = [
+const routes: Router[] = [
   {
     path: '/settings',
     element: <SettingsLayout />,

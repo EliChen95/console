@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { Button } from '@kubed/components';
 
 import ConditionSelect from './ConditionSelect';
 
-import { ConditionEditorWrapper, Footer } from './styles';
+import { ConditionEditorWrapper, ConditionsFooter } from './styles';
 
 export type Condition = {
   key?: string;
@@ -13,7 +13,7 @@ export type Condition = {
 
 type Props = {
   conditions: Condition[];
-  desc?: React.ReactNode;
+  desc?: ReactNode;
   addText?: string;
   className?: string;
 };
@@ -34,12 +34,12 @@ function ConditionEditor({ desc, addText, className, conditions }: Props): JSX.E
       {conditions.map((item, index) => {
         return <ConditionSelect item={item} handleDelete={handleDelete} key={index} />;
       })}
-      <Footer>
+      <ConditionsFooter>
         {desc}
         <Button className="add" onClick={handleAdd}>
           {addText}
         </Button>
-      </Footer>
+      </ConditionsFooter>
     </ConditionEditorWrapper>
   );
 }

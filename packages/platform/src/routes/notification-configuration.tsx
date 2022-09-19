@@ -8,7 +8,7 @@ import { getNotificationConfigurationTabs } from '../utils/navs';
 const tabs: NavItem[] = getNotificationConfigurationTabs();
 const indexRoutePath = get(tabs, '[0].name', '/404');
 
-const routes: Array<Router> = [
+const routes: Router[] = [
   {
     index: true,
     element: <Navigate to={indexRoutePath} replace />,
