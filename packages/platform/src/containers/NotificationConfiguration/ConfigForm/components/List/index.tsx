@@ -6,7 +6,7 @@ import type { ListItem } from '../../../../../types';
 import { ListWrapper } from './styles';
 
 type Props = {
-  items: Array<ListItem>;
+  items: ListItem[];
   className?: string;
   itemClassName?: string;
   onClick?: (item: ListItem) => void;

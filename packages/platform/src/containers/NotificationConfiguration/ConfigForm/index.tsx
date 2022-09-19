@@ -29,7 +29,7 @@ const FORM_MAP: Record<string, React.ReactNode> = {
 
 type Props = {
   currentTab: string;
-  tabs: Array<NavItem>;
+  tabs: NavItem[];
 };
 
 function ConfigForm({ currentTab, tabs }: Props): JSX.Element {

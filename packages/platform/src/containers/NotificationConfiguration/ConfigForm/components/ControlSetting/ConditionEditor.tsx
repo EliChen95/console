@@ -12,7 +12,7 @@ export type Condition = {
 };
 
 type Props = {
-  conditions?: Array<Condition>;
+  conditions: Condition[];
   desc?: React.ReactNode;
   addText?: string;
   className?: string;
@@ -31,7 +31,7 @@ function ConditionEditor({ desc, addText, className, conditions }: Props): JSX.E
 
   return (
     <ConditionEditorWrapper className={className}>
-      {conditions?.map((item, index) => {
+      {conditions.map((item, index) => {
         return <ConditionSelect item={item} handleDelete={handleDelete} key={index} />;
       })}
       <Footer>

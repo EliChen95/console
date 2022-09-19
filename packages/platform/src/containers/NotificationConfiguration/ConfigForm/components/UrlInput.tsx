@@ -7,8 +7,8 @@ import { UrlInputWrapper } from './styles';
 type Props = {
   hostName: string[];
   portName: string[];
-  hostRules?: Array<any>;
-  portRules?: Array<any>;
+  hostRules?: any;
+  portRules?: any;
   readonly?: boolean;
   style?: any;
   className?: string;

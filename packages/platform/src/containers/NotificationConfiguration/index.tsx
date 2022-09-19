@@ -15,7 +15,7 @@ function NotificationConfiguration(): JSX.Element {
   const { tab = 'mail' } = useParams<any>();
   const isLoading = false;
   const tabs: NavItem[] = getNotificationConfigurationTabs();
-  const navs: Array<LabelValue> = tabs.map((item: NavItem) => ({
+  const navs: LabelValue[] = tabs.map((item: NavItem) => ({
     label: t(item.title),
     value: item.name,
   }));
