@@ -6,7 +6,7 @@ import { Pattern } from '@ks-console/shared';
 
 import List from '../components/List';
 import BoxInput from '../components/BoxInput';
-import type { ListItem } from '../../../../types';
+import type { ListItem } from '../components/List/types';
 
 import { ReceiverWrapper } from './styles';
 

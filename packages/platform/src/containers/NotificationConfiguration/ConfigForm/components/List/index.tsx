@@ -1,7 +1,7 @@
 import React from 'react';
 
 import Item from './ListItem';
-import type { ListItem } from '../../../../../types';
+import type { ListItem } from './types';
 
 import { ListWrapper } from './styles';
 

@@ -2,7 +2,7 @@ import React from 'react';
 import { Icon } from '@ks-console/shared';
 import { Button } from '@kubed/components';
 
-import type { ListItem } from '../../../../../types';
+import type { ListItem, ListItemDetail } from './types';
 
 import { ListItemWrapper, ItemContent, ItemText, OperationsWrapper } from './styles';
 
@@ -24,15 +24,12 @@ function Item({ item, className, onDelete, onEdit, onClick }: Props): JSX.Elemen
           <div className="ellipsis title">{title}</div>
           <div className="ellipsis description">{description}</div>
         </ItemText>
-        {details &&
-          details.map((detail: any, index: number) => (
-            <ItemText key={index} className={detail.className}>
-              <div className="ellipsis title">{detail.title}</div>
-              {detail.description && (
-                <div className="ellipsis description">{detail.description}</div>
-              )}
-            </ItemText>
-          ))}
+        {details?.map((detail: ListItemDetail, index: number) => (
+          <ItemText key={index} className={detail.className}>
+            <div className="ellipsis title">{detail.title}</div>
+            {detail.description && <div className="ellipsis description">{detail.description}</div>}
+          </ItemText>
+        ))}
       </ItemContent>
       {operations || (
         <OperationsWrapper className="btns">
