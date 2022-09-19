@@ -1,8 +1,7 @@
 import React from 'react';
 import { get } from 'lodash';
-import { Navigate } from 'react-router-dom';
+import { Navigate, RouteObject } from 'react-router-dom';
 
-import type { Router } from '../types';
 import BaseInfo from '../containers/BaseInfo';
 import { getPlatformSettingsNavs } from '../utils/navs';
 import SettingsLayout from '../containers/SettingsLayout';
@@ -12,7 +11,7 @@ import NotificationConfiguration from '../containers/NotificationConfiguration';
 const navs = getPlatformSettingsNavs();
 const indexRoutePath = get(navs, '[0].children[0].name', '/404');
 
-const routes: Router[] = [
+const routes: RouteObject[] = [
   {
     path: '/settings',
     element: <SettingsLayout />,

@@ -1,11 +1,3 @@
-export type Router = {
-  index?: boolean;
-  name?: string;
-  path?: string;
-  children?: Router[];
-  element?: any;
-};
-
 export type LabelValue = { label: string; value: string };
 
 export type NavItem = {
