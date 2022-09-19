@@ -1,6 +1,6 @@
 import styled from 'styled-components';
 
-export const Wrapper = styled.div`
+export const ConditionEditorWrapper = styled.div`
   margin-top: 12px;
   padding: 12px;
   border-radius: 4px;
@@ -24,6 +24,8 @@ export const Footer = styled.div`
 `;
 
 export const Desc = styled.p`
+  display: inline-flex;
+  margin: 0;
   color: ${({ theme }) => theme.palette.accents_5};
 `;
 
@@ -38,21 +40,16 @@ export const Annotation = styled.div`
     margin-right: 6px;
     flex-shrink: 0;
   }
-
-  .desc {
-    display: inline-flex;
-    margin: 0;
-  }
 `;
 
-export const ConditionItem = styled.div`
+export const ConditionWrapper = styled.div`
   display: flex;
   align-items: center;
+`;
 
-  .selectWrapper {
-    margin-right: 16px;
-    flex: 1;
-    display: flex;
-    gap: 16px;
-  }
+export const SelectWrapper = styled.div`
+  margin-right: 16px;
+  flex: 1;
+  display: flex;
+  gap: 16px;
 `;

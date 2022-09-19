@@ -3,7 +3,7 @@ import React from 'react';
 import Item from './ListItem';
 import type { ListItem } from '../../../../../types';
 
-import { CssContainer } from '../styles';
+import { ListWrapper } from './styles';
 
 type Props = {
   items: Array<ListItem>;
@@ -16,7 +16,7 @@ type Props = {
 
 function List({ items, className, itemClassName, onClick, onDelete, onEdite }: Props): JSX.Element {
   return (
-    <CssContainer className={className}>
+    <ListWrapper className={className}>
       {items.map((item: ListItem, index) => (
         <Item
           key={`${item.title}_${index}`}
@@ -27,7 +27,7 @@ function List({ items, className, itemClassName, onClick, onDelete, onEdite }: P
           onEdit={onEdite}
         />
       ))}
-    </CssContainer>
+    </ListWrapper>
   );
 }
 

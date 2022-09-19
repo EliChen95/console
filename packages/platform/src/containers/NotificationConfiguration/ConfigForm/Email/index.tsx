@@ -8,16 +8,17 @@ import RequireTLS from './RequireTsl';
 import EmailReceivers from './EmailReceivers';
 import UrlInput from '../components/UrlInput';
 
-import { CssContainer } from './styles';
+import { EmailWrapper } from './styles';
+import { ItemWrapper } from '../styles';
 
 function Email(): JSX.Element {
   const [store] = useStore('NotificationConfigStore');
   const defaultRequireTLS = get(store.email, 'config.spec.email.requireTLS', false);
 
   return (
-    <CssContainer>
+    <EmailWrapper>
       <Text className="title">{t('SERVER_SETTINGS')}</Text>
-      <div className="items mb-12">
+      <ItemWrapper className="mb12">
         <FormItem label={t('SMTP_SERVER_ADDRESS')}>
           <UrlInput
             hostName={['config', 'spec', 'email', 'smartHost', 'host']}
@@ -60,9 +61,9 @@ function Email(): JSX.Element {
         >
           <Input className="input-item" placeholder={'admin@example.com'} />
         </FormItem>
-      </div>
+      </ItemWrapper>
       <Text className="title">{t('RECIPIENT_SETTINGS')}</Text>
-      <div className="items mb-12">
+      <ItemWrapper className="mb12">
         <FormItem
           name={['receiver', 'spec', 'email', 'to']}
           rules={[
@@ -74,8 +75,8 @@ function Email(): JSX.Element {
         >
           <EmailReceivers />
         </FormItem>
-      </div>
-    </CssContainer>
+      </ItemWrapper>
+    </EmailWrapper>
   );
 }
 

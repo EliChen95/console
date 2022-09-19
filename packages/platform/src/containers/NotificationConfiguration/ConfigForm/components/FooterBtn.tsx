@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from '@kubed/components';
 
-import { CssContainer } from '../../styles';
+import { FooterBtnWrapper } from './styles';
 
 type Props = {
   isLoading: boolean;
@@ -11,14 +11,14 @@ type Props = {
 
 function FooterBtn({ isLoading, onCancel, handleSubmit }: Props): JSX.Element {
   return (
-    <CssContainer className="footer-btn">
-      <Button className="gap" onClick={onCancel}>
+    <FooterBtnWrapper>
+      <Button className="mr12" onClick={onCancel}>
         {t('CANCEL')}
       </Button>
       <Button color="secondary" loading={isLoading} onClick={handleSubmit} shadow>
         {t('OK')}
       </Button>
-    </CssContainer>
+    </FooterBtnWrapper>
   );
 }
 

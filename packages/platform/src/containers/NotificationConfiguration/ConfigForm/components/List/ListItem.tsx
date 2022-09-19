@@ -1,9 +1,10 @@
 import React from 'react';
-import cx from 'classnames';
 import { Icon } from '@ks-console/shared';
 import { Button } from '@kubed/components';
 
 import type { ListItem } from '../../../../../types';
+
+import { ListItemWrapper, ItemContent, ItemText, OperationsWrapper } from './styles';
 
 type Props = {
   item: ListItem;
@@ -17,24 +18,24 @@ function Item({ item, className, onDelete, onEdit, onClick }: Props): JSX.Elemen
   const { title, details, description, titleClass, operations, ...rest } = item;
 
   return (
-    <div className={cx('list-item', className)} onClick={() => onClick?.(item)} {...rest}>
-      <div className="texts">
-        <div className={cx('text', titleClass)}>
+    <ListItemWrapper className={className} onClick={() => onClick?.(item)} {...rest}>
+      <ItemContent>
+        <ItemText className={titleClass}>
           <div className="ellipsis title">{title}</div>
           <div className="ellipsis description">{description}</div>
-        </div>
+        </ItemText>
         {details &&
           details.map((detail: any, index: number) => (
-            <div key={index} className={cx('text', detail.className)}>
+            <ItemText key={index} className={detail.className}>
               <div className="ellipsis title">{detail.title}</div>
               {detail.description && (
                 <div className="ellipsis description">{detail.description}</div>
               )}
-            </div>
+            </ItemText>
           ))}
-      </div>
+      </ItemContent>
       {operations || (
-        <div className="buttons">
+        <OperationsWrapper className="btns">
           {onDelete && (
             <Button
               className="button-flat"
@@ -59,9 +60,9 @@ function Item({ item, className, onDelete, onEdit, onClick }: Props): JSX.Elemen
               <Icon name="pen" />
             </Button>
           )}
-        </div>
+        </OperationsWrapper>
       )}
-    </div>
+    </ListItemWrapper>
   );
 }
 

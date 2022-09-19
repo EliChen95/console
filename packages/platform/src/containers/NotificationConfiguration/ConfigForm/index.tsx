@@ -16,6 +16,8 @@ import Webhook from './Webhook';
 import DingTalk from './DingTalk';
 import ControlSetting from './components/ControlSetting';
 
+import { Block, HorizonBlock } from './styles';
+
 const FORM_MAP: Record<string, React.ReactNode> = {
   email: <Email />,
   feishu: <FeiShu />,
@@ -78,20 +80,21 @@ function ConfigForm({ currentTab, tabs }: Props): JSX.Element {
     <Form autoComplete="off" initialValues={currentFormData} onValuesChange={onValuesChange}>
       <EnableService
         id={tabType}
+        className="mb12"
         name={['receiver', 'spec', tabType, 'enabled']}
         title={tabs.find(item => item.name === currentTab)?.title ?? 'Mail'}
       />
-      <div className="mb-12 content">
+      <Block className="mb12">
         {FORM_MAP[tabType]}
         <ControlSetting
           id={tabType}
           name={['receiver', 'spec', tabType, 'alertSelector', 'matchExpressions']}
         />
-      </div>
-      <div className="mb-12 content horizon">
+      </Block>
+      <HorizonBlock>
         <p>{t('SEND_TEST_MESSAGE_DESC')}</p>
         <Button onClick={handleVerify}>{t('SEND_TEST_MESSAGE')}</Button>
-      </div>
+      </HorizonBlock>
       <FooterBtn isLoading={isLoading} onCancel={onCancel} handleSubmit={handleSubmit} />
     </Form>
   );

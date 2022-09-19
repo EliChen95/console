@@ -4,9 +4,10 @@ import { useStore } from '@kubed/stook';
 import { Icon } from '@ks-console/shared';
 import { Checkbox, Field, FormItem } from '@kubed/components';
 
-import ConditionEdit from './ConditionEdit';
+import ConditionEditor from './ConditionEditor';
 
 import { Desc, Annotation } from './styles';
+import { ItemWrapper } from '../../styles';
 
 type Props = {
   id: string;
@@ -41,7 +42,7 @@ function ControlSetting({ id, name }: Props): JSX.Element {
   }, [id]);
 
   return (
-    <div className="items">
+    <ItemWrapper>
       <Field
         avatar={<Checkbox checked={checked} onChange={handleChange} />}
         label={t('NOTIFICATION_CONDITION_SETTINGS_DESC')}
@@ -49,7 +50,7 @@ function ControlSetting({ id, name }: Props): JSX.Element {
       />
       {checked && (
         <FormItem name={name} rules={[{ validator: itemValidator }]}>
-          <ConditionEdit
+          <ConditionEditor
             conditions={get(store[id], name.join('.'), [''])}
             addText={t('ADD')}
             desc={
@@ -61,7 +62,7 @@ function ControlSetting({ id, name }: Props): JSX.Element {
           />
         </FormItem>
       )}
-    </div>
+    </ItemWrapper>
   );
 }
 

@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { trim } from 'lodash';
 import { Button, Input } from '@kubed/components';
 
-import { CssContainer } from './styles';
+import { BoxInputWrapper, InputWrapper } from './styles';
 
 type Props = {
   title?: string;
@@ -35,15 +35,15 @@ function BoxInput({ title, className, validate, onAdd, onChange }: Props): JSX.E
   }
 
   return (
-    <CssContainer className={className}>
+    <BoxInputWrapper className={className}>
       {title && <p className="title">{title}</p>}
-      <div className="inputWrapper">
+      <InputWrapper>
         <Input value={inputValue} onKeyUp={handleKeyUp} onChange={handleInputChange} />
-        <Button className="ml-12" onClick={handleAdd}>
+        <Button className="ml12" onClick={handleAdd}>
           {t('ADD')}
         </Button>
-      </div>
-    </CssContainer>
+      </InputWrapper>
+    </BoxInputWrapper>
   );
 }
 

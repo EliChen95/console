@@ -8,6 +8,8 @@ import List from '../components/List';
 import BoxInput from '../components/BoxInput';
 import type { ListItem } from '../../../../types';
 
+import { ReceiverWrapper } from './styles';
+
 type Props = {
   onChange?: (val: string[]) => void;
 };
@@ -48,12 +50,12 @@ function EmailReceivers({ onChange }: Props): JSX.Element {
   }
 
   return (
-    <div className="input-item">
-      <BoxInput className="mb-12" onAdd={onAdd} validate={validateMail} />
+    <ReceiverWrapper>
+      <BoxInput className="mb12" onAdd={onAdd} validate={validateMail} />
       {!!values.length && (
         <List items={values.map((value: string) => ({ title: value }))} onDelete={onDelete} />
       )}
-    </div>
+    </ReceiverWrapper>
   );
 }
 

@@ -3,7 +3,7 @@ import { Button } from '@kubed/components';
 
 import ConditionSelect from './ConditionSelect';
 
-import { Wrapper, Footer } from './styles';
+import { ConditionEditorWrapper, Footer } from './styles';
 
 export type Condition = {
   key?: string;
@@ -18,7 +18,7 @@ type Props = {
   className?: string;
 };
 
-function ArrayInput({ desc, addText, className, conditions }: Props): JSX.Element {
+function ConditionEditor({ desc, addText, className, conditions }: Props): JSX.Element {
   function handleAdd(): void {
     // todo: add condition
     console.log('add condition');
@@ -30,7 +30,7 @@ function ArrayInput({ desc, addText, className, conditions }: Props): JSX.Elemen
   }
 
   return (
-    <Wrapper className={className}>
+    <ConditionEditorWrapper className={className}>
       {conditions?.map((item, index) => {
         return <ConditionSelect item={item} handleDelete={handleDelete} key={index} />;
       })}
@@ -40,8 +40,8 @@ function ArrayInput({ desc, addText, className, conditions }: Props): JSX.Elemen
           {addText}
         </Button>
       </Footer>
-    </Wrapper>
+    </ConditionEditorWrapper>
   );
 }
 
-export default ArrayInput;
+export default ConditionEditor;

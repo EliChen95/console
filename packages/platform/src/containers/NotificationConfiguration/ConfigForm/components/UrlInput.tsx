@@ -2,7 +2,7 @@ import React from 'react';
 import cx from 'classnames';
 import { Row, Col, FormItem, Input } from '@kubed/components';
 
-import { CssContainer } from './styles';
+import { UrlInputWrapper } from './styles';
 
 type Props = {
   hostName: string[];
@@ -26,12 +26,12 @@ function UrlInput({
   defaultPort = 9022,
 }: Props): JSX.Element {
   return (
-    <CssContainer>
+    <UrlInputWrapper>
       <Row className={cx('url-input-wrapper', className)} style={style} columns={12}>
         <Col span={8} style={{ marginRight: '12px' }}>
           <FormItem name={hostName} rules={hostRules}>
             <Input
-              className="gap"
+              className="mr12"
               readOnly={readonly}
               placeholder={`${t('EXAMPLE')}192.168.1.10`}
             />
@@ -43,7 +43,7 @@ function UrlInput({
           </FormItem>
         </Col>
       </Row>
-    </CssContainer>
+    </UrlInputWrapper>
   );
 }
 

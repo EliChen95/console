@@ -8,7 +8,7 @@ import ConfigForm from './ConfigForm';
 import type { LabelValue, NavItem } from '../../types';
 import { getNotificationConfigurationTabs } from '../../utils/navs';
 
-import { CssContainer } from './styles';
+import { ConfigFormWrapper } from './styles';
 
 function NotificationConfiguration(): JSX.Element {
   const navigate = useNavigate();
@@ -25,22 +25,23 @@ function NotificationConfiguration(): JSX.Element {
   }
 
   return (
-    <CssContainer>
-      <div className="mb-12">
+    <ConfigFormWrapper>
+      <div className="mb12">
         <Banner
           icon={<Loudspeaker />}
-          className="mb12"
           title={t('NOTIFICATION_CONFIGURATION')}
           description={t('NOTIFICATION_CONFIGURATION_DESC')}
         />
-        {!isEmpty(navs) && <Navs value={tab} onChange={handleNavsChange} data={navs} />}
+        {!isEmpty(navs) && (
+          <Navs className="mt12" value={tab} onChange={handleNavsChange} data={navs} />
+        )}
       </div>
       <Card>
         <Outlet />
         {isLoading && <Loading className="loading" />}
         {!isLoading && <ConfigForm currentTab={tab} tabs={tabs} />}
       </Card>
-    </CssContainer>
+    </ConfigFormWrapper>
   );
 }
 
