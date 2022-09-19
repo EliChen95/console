@@ -2,7 +2,6 @@ import React, { useState } from 'react';
 import { Icon } from '@ks-console/shared';
 import { Button, Input, Select } from '@kubed/components';
 
-// import TagInput from '../TagInput';
 import type { Condition } from './ConditionEditor';
 
 import { ErrorText, ConditionWrapper, SelectWrapper } from './styles';
@@ -31,25 +30,17 @@ function ConditionSelect({ item, handleDelete }: Props): JSX.Element {
     if (key === 'severity') {
       return (
         <Select
+          multi
           name="values"
           value={values}
-          // options={this.severities}
-          multi
-          // onChange={this.handleValueChange}
           placeholder={t('VALUES')}
+          // options={this.severities}
+          // onChange={this.handleValueChange}
         />
       );
     }
 
-    return (
-      // <TagInput
-      //   name="values"
-      //   placeholder={t('VALUES')}
-      //   value={values}
-      //   onChange={handleValueChange}
-      // />
-      <Input />
-    );
+    return <Input />;
   }
 
   return (
