@@ -16,3 +16,13 @@ export const StyledForm = styled(Form)`
     }
   }
 `;
+
+export const FieldLable = styled.div`
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  word-wrap: normal;
+  overflow: hidden;
+  font-weight: 400;
+  color: #79879c;
+  max-width: 300px;
+`;

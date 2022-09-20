@@ -27,7 +27,7 @@ import { FormattedWorkspace, WorkspaceFormValues } from '../../types/workspaces'
 import WorkspacesCreateModal from './WorkspaceCreateModal';
 import WorkspacesEditModal from './WorkspaceEditModal';
 
-import { DescribleWrapper } from './styles';
+import { DescribleWrapper, FieldLable } from './styles';
 
 const { fetchList } = ClusterStore;
 
@@ -118,7 +118,7 @@ export default function Workspaces(): JSX.Element {
         icon: <Pen />,
         text: t('EDIT_INFORMATION'),
         action: 'edit',
-        show: !isSystemWorkspaces,
+        show: row => !isSystemWorkspaces(row),
         onClick: (e, record) => {
           setEditVisible(true);
           setEditWorkspace(record as FormattedWorkspace);
@@ -129,7 +129,7 @@ export default function Workspaces(): JSX.Element {
         icon: <Trash />,
         text: t('DELETE'),
         action: 'delete',
-        show: !isSystemWorkspaces,
+        show: row => !isSystemWorkspaces(row),
         onClick: (e, record) => {
           setWorkspaces([record as FormattedWorkspace]);
           setDeleteVisible(true);
@@ -164,11 +164,9 @@ export default function Workspaces(): JSX.Element {
       render: (value, row) => {
         return (
           <Field
-            value={getDisplayName(row)}
+            value={<Link to={value}>{getDisplayName(row)}</Link>}
             avatar={<Enterprise size={40} />}
-            label={row.description || '-'}
-            as={Link}
-            to={`/workspaces/${value}`}
+            label={<FieldLable>{row.description || '-'}</FieldLable>}
           />
         );
       },
@@ -214,6 +212,7 @@ export default function Workspaces(): JSX.Element {
         format={workspaceMapper}
         batchActions={renderBatchActions()}
         useStorageState={false}
+        placeholder={t('SEARCH_BY_NAME')}
         toolbarRight={renderTableActions()}
         disableRowSelect={isSystemWorkspaces}
         ref={tableRef}

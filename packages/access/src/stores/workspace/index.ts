@@ -21,6 +21,7 @@ const getTenantUrl = (params = {}) =>
 
 export const getListUrl = (params: Record<string, any> = {}) =>
   params.cluster ? getResourceUrl() : getTenantUrl();
+
 export const getDetailUrl = (params: PathParams = {}) => `${getListUrl(params)}/${params.name}`;
 
 export const workspaceMapper = (item: OriginalWorkspace): FormattedWorkspace => {
@@ -54,6 +55,7 @@ export const workspaceMapper = (item: OriginalWorkspace): FormattedWorkspace => 
     _originData: getOriginData(item),
   };
 };
+
 export const deleteWorkspace = ({
   params = {},
   data,
@@ -98,4 +100,16 @@ export function useWorkspacesEditMutation(options?: { onSuccess?: () => void }) 
       onSuccess,
     },
   );
+}
+
+export async function nameValidator(params?: PathParams, query?: Record<string, any>) {
+  const resp: any = await request.get(getDetailUrl(params), {
+    query,
+    headers: {
+      // @ts-ignore
+      'x-check-exist': true,
+    },
+  });
+  if (resp.exist) return Promise.reject(t('WORKSPACE_NAME_EXISTS_DESC'));
+  return Promise.resolve();
 }

@@ -1,8 +1,8 @@
 import React, { useImperativeHandle, forwardRef, Ref, UIEvent } from 'react';
 import { debounce, merge } from 'lodash';
 import { FormItem, useForm, Input, Select, FormInstance } from '@kubed/components';
-import { Pattern, validator } from '@ks-console/shared';
-import { getDetailUrl } from '../../../stores/workspace';
+import { Pattern } from '@ks-console/shared';
+import { nameValidator } from '../../../stores/workspace';
 import { useUsers } from '../../../stores/user';
 import type { OriginalWorkspace, WorkspaceFormValues } from '../../../types/workspaces';
 
@@ -103,7 +103,8 @@ function WorkspaceBaseInfomation(
               if (value === 'workspaces') {
                 return Promise.reject(t('current name is not available'));
               }
-              return validator.nameValidator(getDetailUrl({ name: value }));
+
+              return nameValidator({ name: value });
             },
           },
         ]}
