@@ -9,6 +9,7 @@ export type BaseTemplate = {
   kind: string;
   metadata: {
     name: string;
+    [key: string]: unknown;
   };
   spec?: Record<string, unknown>;
   type?: string;

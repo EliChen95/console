@@ -2,10 +2,10 @@ import React, { useState } from 'react';
 import { Icon } from '@ks-console/shared';
 import { Button, Input, Select } from '@kubed/components';
 
+import { SEVERITY_LEVEL } from './constants';
 import type { Condition, SeverityLevel } from './types';
 
 import { ErrorText, ConditionWrapper, SelectWrapper } from './styles';
-import { SEVERITY_LEVEL } from './constants';
 
 type Props = {
   item: Condition;
@@ -35,7 +35,6 @@ function ConditionSelect({ item, handleDelete }: Props): JSX.Element {
       value: 'container',
     },
   ];
-
   const operators = [
     {
       label: t('INCLUDES_VALUES'),
@@ -54,11 +53,16 @@ function ConditionSelect({ item, handleDelete }: Props): JSX.Element {
       value: 'DoesNotExist',
     },
   ];
+  const severities = SEVERITY_LEVEL.map((level: SeverityLevel) => ({
+    label: t(level.label),
+    value: level.value,
+    level: level,
+  }));
   const [keyErrorTip] = useState('');
 
   function handleKeyChange(): void {}
 
-  // function handleValueChange(): void {}
+  function handleValueChange(): void {}
 
   function handleOperatorChange(): void {}
 
@@ -76,16 +80,13 @@ function ConditionSelect({ item, handleDelete }: Props): JSX.Element {
           name="values"
           value={values}
           placeholder={t('VALUES')}
-          options={SEVERITY_LEVEL.map((level: SeverityLevel) => ({
-            label: t(level.label),
-            value: level.value,
-            level: level,
-          }))}
-          // onChange={this.handleValueChange}
+          options={severities}
+          onChange={handleValueChange}
         />
       );
     }
 
+    // todo use TagInput component
     return <Input />;
   }
 
