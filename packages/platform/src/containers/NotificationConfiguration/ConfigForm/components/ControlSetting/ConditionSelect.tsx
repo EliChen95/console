@@ -13,6 +13,7 @@ type Props = {
 };
 
 function ConditionSelect({ item, handleDelete }: Props): JSX.Element {
+  const { operator, key, values } = item;
   const keys = [
     {
       label: t('ALERTING_NAME'),
@@ -67,8 +68,6 @@ function ConditionSelect({ item, handleDelete }: Props): JSX.Element {
   function handleOperatorChange(): void {}
 
   function renderValues() {
-    const { operator, key, values } = item;
-
     if (operator === 'Exists' || operator === 'DoesNotExist') {
       return null;
     }
@@ -87,7 +86,9 @@ function ConditionSelect({ item, handleDelete }: Props): JSX.Element {
     }
 
     // todo use TagInput component
-    return <Input />;
+    return (
+      <Input name="values" placeholder={t('VALUES')} value={values} onChange={handleValueChange} />
+    );
   }
 
   return (
@@ -96,14 +97,14 @@ function ConditionSelect({ item, handleDelete }: Props): JSX.Element {
         <SelectWrapper>
           <Select
             name="key"
-            // value={key}
+            value={key}
             options={keys}
             placeholder={t('LABEL')}
             onChange={handleKeyChange}
           />
           <Select
             name="operator"
-            // value={operator}
+            value={operator}
             options={operators}
             onChange={handleOperatorChange}
             placeholder={t('CONDITION_OPERATOR')}
