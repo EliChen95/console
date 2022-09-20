@@ -38,8 +38,7 @@ function NotificationConfiguration(): JSX.Element {
       </div>
       <Card>
         <Outlet />
-        {isLoading && <Loading className="loading" />}
-        {!isLoading && <ConfigForm currentTab={tab} tabs={tabs} />}
+        {isLoading ? <Loading className="loading" /> : <ConfigForm currentTab={tab} tabs={tabs} />}
       </Card>
     </ConfigFormWrapper>
   );
