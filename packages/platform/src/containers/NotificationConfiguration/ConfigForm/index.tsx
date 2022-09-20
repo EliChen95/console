@@ -55,7 +55,6 @@ function ConfigForm({ currentTab, tabs }: Props): JSX.Element {
   ): void {
     const formData = cloneDeep(store);
     const mergedData = mergeWith(formData, { [tabType]: values }, customMerge);
-    console.log(mergedData);
     setStore(mergedData);
   }
 

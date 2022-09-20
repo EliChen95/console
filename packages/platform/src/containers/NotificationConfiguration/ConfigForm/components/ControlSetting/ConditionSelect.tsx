@@ -1,20 +1,51 @@
-import React, { useState } from 'react';
+import React, { ChangeEvent, useState } from 'react';
+import { isEmpty } from 'lodash';
 import { Icon } from '@ks-console/shared';
-import { Button, Input, Select } from '@kubed/components';
+import { Button, Input, notify, Select } from '@kubed/components';
 
-import { SEVERITY_LEVEL } from './constants';
-import type { Condition, SeverityLevel } from './types';
+import type { Condition } from './types';
+// todo ues the alias path
+import type { LabelValue } from '../../../../../types';
+import { PATTERN_TAG } from '../../../../../constants';
 
-import { ErrorText, ConditionWrapper, SelectWrapper } from './styles';
+import {
+  ErrorText,
+  ConditionWrapper,
+  SelectWrapper,
+  OptionsContainer,
+  OptionsListWrapper,
+  CustomSelect,
+  IconWrapper,
+} from './styles';
 
 type Props = {
   item: Condition;
   handleDelete: () => void;
 };
 
+type ConditionItem = Condition & {
+  keyName?: string;
+  keyItems?: LabelValue[];
+};
+
+function initConditionItem(keys: LabelValue[], item: Condition): ConditionItem {
+  const { key, operator, values } = item;
+
+  // todo consider key is empty string, which keyItems type it is ?
+  return {
+    key,
+    operator,
+    values,
+    keyName: '',
+    keyItems:
+      key && isEmpty(keys.find((keyItem: any) => keyItem.value === key))
+        ? [...keys, { label: key, value: key }]
+        : [...keys],
+  };
+}
+
 function ConditionSelect({ item, handleDelete }: Props): JSX.Element {
-  const { operator, key, values } = item;
-  const keys = [
+  const keys: LabelValue[] = [
     {
       label: t('ALERTING_NAME'),
       value: 'alertname',
@@ -54,40 +85,93 @@ function ConditionSelect({ item, handleDelete }: Props): JSX.Element {
       value: 'DoesNotExist',
     },
   ];
-  const severities = SEVERITY_LEVEL.map((level: SeverityLevel) => ({
-    label: t(level.label),
-    value: level.value,
-    level: level,
-  }));
+  const [conditionItem, setConditionItem] = useState<ConditionItem>(initConditionItem(keys, item));
   const [keyErrorTip] = useState('');
 
-  function handleKeyChange(): void {}
+  function handleKeyChange(key: string): void {
+    setConditionItem(prevConditionItem => {
+      return { ...prevConditionItem, key };
+    });
+  }
 
-  function handleValueChange(): void {}
+  function handleValuesChange({ target }: ChangeEvent<HTMLInputElement>): void {
+    setConditionItem(prevConditionItem => {
+      return { ...prevConditionItem, values: [target.value] };
+    });
+  }
 
-  function handleOperatorChange(): void {}
+  function handleOperatorChange(operator: string): void {
+    setConditionItem(prevConditionItem => {
+      return { ...prevConditionItem, operator };
+    });
+  }
 
-  function renderValues() {
+  function handleAddItem(): void {
+    const { keyItems = [], keyName = '' } = conditionItem;
+
+    if (!PATTERN_TAG.test(keyName)) {
+      notify.error(t('PATTERN_TAG_INVALID_TIP'));
+      return;
+    }
+
+    setConditionItem(prevConditionItem => {
+      return {
+        ...prevConditionItem,
+        keyItems: [...keyItems, { label: keyName, value: keyName }],
+        keyName: '',
+      };
+    });
+  }
+
+  function handleNameChange({ target }: ChangeEvent<HTMLInputElement>): void {
+    setConditionItem(prevConditionItem => {
+      return { ...prevConditionItem, keyName: target.value };
+    });
+  }
+
+  function dropDownRender(options: any): JSX.Element {
+    return (
+      <OptionsContainer>
+        <OptionsListWrapper>{options}</OptionsListWrapper>
+        <CustomSelect>
+          {/* to fix the value isn't change when keyName is empty string */}
+          <Input value={conditionItem.keyName} onChange={handleNameChange} />
+          <IconWrapper onClick={handleAddItem}>
+            <Icon name="add" variant="light" size={12} />
+          </IconWrapper>
+        </CustomSelect>
+      </OptionsContainer>
+    );
+  }
+
+  function valuesRender() {
+    const { key, operator, values } = conditionItem;
     if (operator === 'Exists' || operator === 'DoesNotExist') {
       return null;
     }
 
     if (key === 'severity') {
-      return (
-        <Select
-          multi
-          name="values"
-          value={values}
-          placeholder={t('VALUES')}
-          options={severities}
-          onChange={handleValueChange}
-        />
-      );
+      // const severities = SEVERITY_LEVEL.map((level: SeverityLevel) => ({
+      //   label: t(level.label),
+      //   value: level.value,
+      //   level: level,
+      // }));
+      //
+      // return (
+      //   <Select
+      //     multi
+      //     name="values"
+      //     value={values}
+      //     placeholder={t('VALUES')}
+      //     options={severities}
+      //     onChange={handleValuesChange}
+      //   />
+      // );
     }
 
     // todo use TagInput component
     return (
-      <Input name="values" placeholder={t('VALUES')} value={values} onChange={handleValueChange} />
+      <Input name="values" placeholder={t('VALUES')} value={values} onChange={handleValuesChange} />
     );
   }
 
@@ -97,21 +181,22 @@ function ConditionSelect({ item, handleDelete }: Props): JSX.Element {
         <SelectWrapper>
           <Select
             name="key"
-            value={key}
-            options={keys}
+            value={conditionItem.key}
+            options={conditionItem.keyItems}
             placeholder={t('LABEL')}
             onChange={handleKeyChange}
+            dropdownRender={dropDownRender}
           />
           <Select
             name="operator"
-            value={operator}
+            value={conditionItem.operator}
             options={operators}
             onChange={handleOperatorChange}
             placeholder={t('CONDITION_OPERATOR')}
           />
-          {renderValues()}
+          {valuesRender()}
         </SelectWrapper>
-        <Button className="delete" onClick={handleDelete}>
+        <Button onClick={handleDelete}>
           <Icon name="trash" />
         </Button>
       </ConditionWrapper>

@@ -29,7 +29,7 @@ export const ItemWrapper = styled.div`
   padding: 12px;
   border: solid 1px ${({ theme }) => theme.palette.accents_2};
   border-radius: 4px;
-  background: white;
+  background: #fff;
 
   .field-avatar {
     margin-top: -16px;
