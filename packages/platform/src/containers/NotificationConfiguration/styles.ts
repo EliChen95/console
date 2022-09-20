@@ -7,4 +7,17 @@ export const ConfigFormWrapper = styled.div`
     margin-left: 50%;
     transform: 'translateX(-50%)';
   }
+
+  .button-flat {
+    border: 1px solid transparent;
+    background-color: transparent;
+
+    &:hover {
+      background-color: ${({ theme }) => theme.palette.accents_2};
+    }
+
+    &:active {
+      background-color: #d8dee5;
+    }
+  }
 `;

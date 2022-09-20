@@ -17,7 +17,9 @@ function Email(): JSX.Element {
 
   return (
     <EmailWrapper>
-      <Text className="title">{t('SERVER_SETTINGS')}</Text>
+      <Text className="title" style={{ marginTop: '0' }}>
+        {t('SERVER_SETTINGS')}
+      </Text>
       <ItemWrapper className="mb12">
         <FormItem label={t('SMTP_SERVER_ADDRESS')}>
           <UrlInput
@@ -63,7 +65,7 @@ function Email(): JSX.Element {
         </FormItem>
       </ItemWrapper>
       <Text className="title">{t('RECIPIENT_SETTINGS')}</Text>
-      <ItemWrapper className="mb12">
+      <ItemWrapper className="mb12 receiver">
         <FormItem
           name={['receiver', 'spec', 'email', 'to']}
           rules={[

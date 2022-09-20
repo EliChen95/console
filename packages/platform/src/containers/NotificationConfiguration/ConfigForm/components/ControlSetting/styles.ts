@@ -45,8 +45,7 @@ export const Annotation = styled.div`
 export const ConditionWrapper = styled.div`
   display: flex;
   align-items: center;
-  gap: 20px;
-  padding: 6px 17px;
+  padding: 6px 6px 6px 17px;
   border-radius: 60px;
   background-color: ${({ theme }) => theme.palette.accents_1};
   border: solid 1px ${({ theme }) => theme.palette.border};
@@ -56,6 +55,7 @@ export const SelectWrapper = styled.div`
   flex: 1;
   display: flex;
   align-items: center;
+  margin-right: 4px;
 
   & > div + div {
     margin-left: 12px;

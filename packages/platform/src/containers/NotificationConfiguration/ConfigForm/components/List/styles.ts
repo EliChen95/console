@@ -41,19 +41,6 @@ export const ItemText = styled.div`
 
 export const OperationsWrapper = styled.div`
   display: none;
-
-  .button-flat {
-    border: 1px solid transparent;
-    background-color: transparent;
-
-    &:hover {
-      background-color: ${({ theme }) => theme.palette.accents_2};
-    }
-
-    &:active {
-      background-color: #d8dee5;
-    }
-  }
 `;
 
 export const ListWrapper = styled.div`

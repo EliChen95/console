@@ -51,9 +51,13 @@ function EmailReceivers({ onChange }: Props): JSX.Element {
 
   return (
     <ReceiverWrapper>
-      <BoxInput className="mb12" onAdd={onAdd} validate={validateMail} />
+      <BoxInput onAdd={onAdd} validate={validateMail} />
       {!!values.length && (
-        <List items={values.map((value: string) => ({ title: value }))} onDelete={onDelete} />
+        <List
+          className="mt12"
+          items={values.map((value: string) => ({ title: value }))}
+          onDelete={onDelete}
+        />
       )}
     </ReceiverWrapper>
   );

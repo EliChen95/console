@@ -196,7 +196,7 @@ function ConditionSelect({ item, handleDelete }: Props): JSX.Element {
           />
           {valuesRender()}
         </SelectWrapper>
-        <Button onClick={handleDelete}>
+        <Button className="button-flat" onClick={handleDelete}>
           <Icon name="trash" />
         </Button>
       </ConditionWrapper>

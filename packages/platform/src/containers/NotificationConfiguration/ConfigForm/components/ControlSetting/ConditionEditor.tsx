@@ -31,9 +31,7 @@ function ConditionEditor({ desc, addText, className, conditions }: Props): JSX.E
       })}
       <ConditionsFooter>
         {desc}
-        <Button className="add" onClick={handleAdd}>
-          {addText}
-        </Button>
+        <Button onClick={handleAdd}>{addText}</Button>
       </ConditionsFooter>
     </ConditionEditorWrapper>
   );
