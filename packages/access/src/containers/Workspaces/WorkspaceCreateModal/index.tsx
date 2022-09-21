@@ -33,7 +33,6 @@ export default function WorkspacesCreateModal({
   };
 
   const handleNext = (value: WorkspaceFormValues) => {
-    console.log(value);
     setBaseInfo(value);
     nextStep();
   };
