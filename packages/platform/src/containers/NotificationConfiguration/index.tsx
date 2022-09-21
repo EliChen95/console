@@ -1,23 +1,22 @@
 import React from 'react';
 import { isEmpty } from 'lodash';
-import { Bell } from '@kubed/icons';
-import styled from 'styled-components';
-import { Banner, Navs, Card } from '@kubed/components';
-import { Outlet, useNavigate } from 'react-router-dom';
+import { Loudspeaker } from '@kubed/icons';
+import { Outlet, useNavigate, useParams } from 'react-router-dom';
+import { Banner, Navs, Card, Loading } from '@kubed/components';
 
+import ConfigForm from './ConfigForm';
 import type { LabelValue, NavItem } from '../../types';
-import { NOTIFICATION_CONF_NAV_LOCALS_MAP } from '../../constants';
 import { getNotificationConfigurationTabs } from '../../utils/navs';
 
-const PageHeader = styled.div`
-  margin-bottom: 12px;
-`;
+import { ConfigFormWrapper } from './styles';
 
 function NotificationConfiguration(): JSX.Element {
   const navigate = useNavigate();
+  const { tab = 'mail' } = useParams();
+  const isLoading = false;
   const tabs: NavItem[] = getNotificationConfigurationTabs();
-  const navs: Array<LabelValue> = tabs.map((item: any) => ({
-    label: t(NOTIFICATION_CONF_NAV_LOCALS_MAP[item.name]),
+  const navs: LabelValue[] = tabs.map((item: NavItem) => ({
+    label: t(item.title),
     value: item.name,
   }));
 
@@ -26,20 +25,22 @@ function NotificationConfiguration(): JSX.Element {
   }
 
   return (
-    <>
-      <PageHeader>
+    <ConfigFormWrapper>
+      <div className="mb12">
         <Banner
-          icon={<Bell />}
-          className="mb12"
+          icon={<Loudspeaker />}
           title={t('NOTIFICATION_CONFIGURATION')}
           description={t('NOTIFICATION_CONFIGURATION_DESC')}
         />
-        {!isEmpty(navs) && <Navs onChange={handleNavsChange} data={navs} />}
-      </PageHeader>
+        {!isEmpty(navs) && (
+          <Navs className="mt12" value={tab} onChange={handleNavsChange} data={navs} />
+        )}
+      </div>
       <Card>
         <Outlet />
+        {isLoading ? <Loading className="loading" /> : <ConfigForm currentTab={tab} tabs={tabs} />}
       </Card>
-    </>
+    </ConfigFormWrapper>
   );
 }
 

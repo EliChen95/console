@@ -1,7 +1,7 @@
-import React from "react";
+import React from 'react';
 
 function DingTalk(): JSX.Element {
-  return <>DingTalk</>
+  return <>DingTalk</>;
 }
 
 export default DingTalk;

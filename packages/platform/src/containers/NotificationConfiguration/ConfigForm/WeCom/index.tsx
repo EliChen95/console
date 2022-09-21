@@ -1,7 +1,7 @@
-import React from "react";
+import React from 'react';
 
 function WeCom(): JSX.Element {
-  return <>WeCom</>
+  return <>WeCom</>;
 }
 
 export default WeCom;

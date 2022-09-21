@@ -1,10 +1,3 @@
 export const NAV_KEY = 'SETTINGS_NAV';
 
-export const NOTIFICATION_CONF_NAV_LOCALS_MAP: Record<string, string> = {
-  mail: 'NOTIFICATION_EMAIL',
-  feishu: 'Feishu',
-  dingtalk: 'DingTalk',
-  wecom: 'WeCom',
-  slack: 'Slack',
-  webhook: 'Webhook',
-};
+export const PATTERN_TAG = /^[A-Za-z0-9]([-A-Za-z0-9_.]*[A-Za-z0-9])?$/;
